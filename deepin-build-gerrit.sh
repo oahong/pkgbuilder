@@ -152,7 +152,10 @@ debsrcFormatter() {
 }
 
 fixBuildDeps() {
-	
+    echo "Replace golang-go in build deps with gccgo-5"
+    if pkgIsDebianized ; then
+        sed -e 's@golang-go\s*,@gccgo-5 | &@g' -i debian/control
+    fi
 }
 
 apply_patches() {
@@ -278,7 +281,7 @@ make_orig_tarball() {
 
     if [[ -z ${tag} ]] ;then
         echo "tag fallback to 0.1"  
-            tag=0.1
+        tag=0.1
     fi
     assert tag
 
@@ -308,6 +311,7 @@ build_package() {
     pushd ${workdir}/${pkgname}-${PKGVER}
 
     apply_patches
+    fixBuildDeps
 
     if [[ $do_build -eq 0 ]] ; then
         dch -v ${PKGVER} -D unstable $changelog
