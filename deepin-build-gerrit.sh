@@ -167,10 +167,13 @@ fixDebuildOptions() {
             echo "Golang package detected, trying to fix debuild option"
             BOPTS+=" -e USE_GGCGO=1 -e CGO_ENABLED=1"
         fi
-
-        [[ $pkgname == dde-file-manager-backend ]] && \
-            BOPTS+=" -e CGO_LDTHREAD=-lpthread"
     fi
+
+    [[ $pkgname == deepin-file-manager-backend ]] && \
+        BOPTS+=" -e CGO_LDTHREAD=-lpthread"
+
+    # pkgname test maybe fail, force return true
+    return 0
 }
 
 apply_patches() {
