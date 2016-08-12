@@ -10,6 +10,7 @@ declare -r BASEURI='http://cr.deepin.io'
 declare -r REPOBASE=${WORKBASE}/git-repos
 declare -r SVERSION="v0.0.1"
 declare -r DPKGBOPTIONS="-us -uc -sa -j8"
+declare -i CHANGELIST=
 
 declare BOPTS=
 declare PKGVER=
@@ -59,7 +60,7 @@ Help Options:
   -h, --help            Show help options
 Application Options:
   -c, --changelog=CHANGE    Use CHANGE as debian package changelog      
-  -l, --cl=NUMBER           Build package based on CL: NUMBER
+  -l, --cl=NUMBER           Build package based on a CL: NUMBER
   -n, --pkgname=PKGNAME     Build PKGNAME
   -w, --workdir=DIR         Override the default workdir
   -b, --build               Start the real build, otherwise the script will
@@ -72,6 +73,33 @@ EOF
 die() {
     echo "$BASH_LINENO: $@" >&2
     exit 1
+}
+
+has_bin() {
+    local executable=$1
+    if [[ -n $(type $1) ]] ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+configGitReview() {
+    echo "create per project gitreview configuration"
+    if [[ ! -f .gitreview ]] ; then
+        cat <<EOF > .gitreview 
+[gerrit]
+defaultremote = origin
+EOF
+    fi
+}
+
+downloadGerritChange() {
+    if has_bin git-review ; then
+        git review -d $1
+    else
+        die "No git-review package in the system!!!"
+    fi
 }
 
 assert() {
@@ -193,7 +221,7 @@ We're working on
     pkgname:        $pkgname
     workdir:        $workdir
     changelog:      $changelog
-    CL:         $cl
+    CL:             $CHANGELIST
     repository:     $repository
 EOF
 }
@@ -214,12 +242,8 @@ while : ; do
             shift 2
             ;;
         -l|--cl)
-            if [[ $2 =~ [0-9]+ ]]; then
-                cl=$2
-            else
-                echo "CL is ilegal"
-                exit 3
-            fi
+            CHANGELIST=$2
+            [[ $CHANGELIST -eq 0 ]] && die "CL $CHANGELIST is illegal"
             shift 2
             ;;
         -n|--pkgname)
@@ -285,6 +309,8 @@ make_orig_tarball() {
         work_branch=master
     fi
 
+    has_bin git || die "No git package in the system"
+
     # fetch git repository
     [[ -d ${repodir}/.git ]] || git clone -b ${work_branch} ${repository} ${repodir}
 
@@ -306,7 +332,14 @@ make_orig_tarball() {
     fi
     assert tag
 
-    PKGVER=$tag+r${revision}~${commit_id}
+    # gerrit CL workflow
+    if [[ ${CHANGELIST} -gt 1 ]] ; then
+        configGitReview
+        downloadGerritChange $CHANGELIST
+        PKGVER=$tag+cl~$CHANGELIST
+    else
+        PKGVER=$tag+r${revision}~${commit_id}
+    fi
 
     echo "Create ${pkgname} upstream source tarball..."
     git archive --format=tar --prefix=${pkgname}-${PKGVER}/ HEAD | \
@@ -331,7 +364,9 @@ prepare_build() {
 build_package() {
     pushd ${workdir}/${pkgname}-${PKGVER}
 
-    apply_patches
+    # Apply patches unless build official package (Not from any CL)
+    [[ -n $CHANGELIST ]] && apply_patches
+
     fixBuildDeps
     fixDebuildOptions
 
