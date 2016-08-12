@@ -231,7 +231,7 @@ EOF
 
 [[ $EUID -eq 0 ]] && die "Don't build package with priviledged users"
 
-OPTS=$(getopt -n build-package -o 'c:l:n:w:bhv' \
+OPTS=$(getopt -n build-package -o 'c:l:n:B:w:bhv' \
           --long changelog:,cl:,pkgname:,workdir:,build,help,version -- "$@")
 
 [[ $? -eq 0 ]] || die "Sorry! I don't understand!!!"
@@ -255,6 +255,10 @@ while : ; do
             ;;
         -w|--workdir)
             workdir=${WORKBASE}/${2}
+            shift 2
+            ;;
+        -B|--workbranch)
+            workbranch=$2
             shift 2
             ;;
         -b|--build)
@@ -302,14 +306,18 @@ fi
 patchdir=${WORKBASE}/patches/${pkgname}
 
 make_orig_tarball() {
-    local work_branch=master
+    if [ x${workbranch} = x"" ] ;then
+        workbranch=master
+    fi
+    
+    local work_branch=${workbranch}
     local repodir=${REPOBASE}/${pkgname}
     local has_raccoon=$(contains ${pkgname} ${raccoon_components[@]})
 
     if [[ $has_raccoon -eq 0 ]] ; then
         work_branch=raccoon
     else
-        work_branch=master
+        work_branch=${workbranch}
     fi
 
     has_bin git || die "No git package in the system"
