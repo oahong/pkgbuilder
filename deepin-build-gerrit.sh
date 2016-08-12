@@ -266,6 +266,9 @@ else
     repository=${BASEURI}/${pkgname}
 fi
 
+[[ ${pkgname} == deepin-default-settings ]] && \
+    repository=${BASEURI}/${pkgname##deepin-}
+
 patchdir=${WORKBASE}/patches/${pkgname}
 
 make_orig_tarball() {
