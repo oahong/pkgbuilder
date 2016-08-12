@@ -8,8 +8,8 @@ set -e
 declare -r WORKBASE=/mnt/packages
 declare -r BASEURI='http://cr.deepin.io'
 declare -r REPOBASE=${WORKBASE}/git-repos
-declare -r BOPTS="-us -uc -sa -j8"
 declare -r SVERSION="v0.0.1"
+declare BOPTS="-us -uc -sa -j8"
 declare PKGVER=
 
 declare -r dde_components=(
@@ -160,7 +160,7 @@ fixBuildDeps() {
 
 fixDebuildOptions() {
     if pkgIsDebianized ; then
-        if grep -wqs golang-go debian/control
+        if grep -wqs golang-go debian/control ; then
             echo "Golang package detected, trying to fix debuild options"
             BOPTS+=" -e USE_GGCGO=1 -e CGO_ENABLED=1"
         fi
