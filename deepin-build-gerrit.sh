@@ -273,7 +273,7 @@ make_orig_tarball() {
     pushd ${repodir}
 
     # in case we need to switch branches
-    git checkout -b ${work_branch} --track origin/${work_branch}
+    git checkout -B ${work_branch} --track origin/${work_branch}
     git pull origin ${work_branch}
 
     local commit_id=$(git rev-parse HEAD | cut -b 1-6)
