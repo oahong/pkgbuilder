@@ -263,15 +263,18 @@ make_orig_tarball() {
 
     if [[ $has_raccoon -eq 0 ]] ; then
         work_branch=raccoon
+    else
+        work_branch=master
     fi
 
     # fetch git repository
-    [[ -d ${repodir}/.git ]] || git clone ${repository} ${repodir}
+    [[ -d ${repodir}/.git ]] || git clone -b ${work_branch} ${repository} ${repodir}
 
     pushd ${repodir}
 
+    # in case we need to switch branches
+    git checkout -b ${work_branch} --track origin/${work_branch}
     git pull origin ${work_branch}
-    git checkout ${work_branch}
 
     local commit_id=$(git rev-parse HEAD | cut -b 1-6)
     assert commit_id
