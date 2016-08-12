@@ -114,6 +114,14 @@ has_patch() {
     fi
 }
 
+pkgIsDebianized() {
+    if [[ -d debian ]] ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 dquilt() {
     quilt --quiltrc=${HOME}/.quiltrc-dpkg -f $@
 }
@@ -143,8 +151,13 @@ debsrcFormatter() {
     fi
 }
 
+fixBuildDeps() {
+	
+}
+
 apply_patches() {
-    [[ ! -d debian ]] && die "You should work on package source directory!!!"
+    pkgIsDebianized || \
+        die "You should debianize your package, workdir: $PWD!!!"
 
     if has_patch $patchdir ; then
 	debsrcFormatter
@@ -285,7 +298,7 @@ prepare_build() {
     popd
 
     pushd ${workdir}/${pkgname}-${PKGVER}
-    if [[ ! -d debian ]] ; then
+    if ! pkgIsDebianized ; then
         cp -a ${WORKBASE}/pkg_debian/${pkgname}/debian .
     fi
     popd
