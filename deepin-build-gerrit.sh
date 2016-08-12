@@ -1,7 +1,7 @@
 #! /bin/bash
 # TODO:
-#	1. rewrite
-# 	2. add gerrit/git-review support
+#   1. rewrite
+#   2. add gerrit/git-review support
 
 set -e
 
@@ -56,12 +56,12 @@ Help Options:
   -h, --help            Show help options
 Application Options:
   -c, --changelog=CHANGE    Use CHANGE as debian package changelog      
-  -l, --cl=NUMBER       Build package based on CL: NUMBER
+  -l, --cl=NUMBER           Build package based on CL: NUMBER
   -n, --pkgname=PKGNAME     Build PKGNAME
-  -w, --workdir=DIR     Override the default workdir
-  -b, --build           Start the real build, otherwise the script will
-                                just do preparation for a package build
-  -v, --version         Show version
+  -w, --workdir=DIR         Override the default workdir
+  -b, --build               Start the real build, otherwise the script will
+                            just do preparation for a package build
+  -v, --version             Show version
 EOF
     exit 0
 }
@@ -136,7 +136,7 @@ debsrcFormatter() {
     fi
 
     if [[ $sformat =~ 3.0[[:space:]]\((native|quilt)\) ]] ; then
-	echo "${pkgname} has debsrc 3.0 format: $sformat"
+    echo "${pkgname} has debsrc 3.0 format: $sformat"
     fi
 
     if has_patch; then
@@ -163,7 +163,7 @@ apply_patches() {
         die "You should debianize your package, workdir: $PWD!!!"
 
     if has_patch $patchdir ; then
-	debsrcFormatter
+    debsrcFormatter
 
         for patch in $patchdir/*.patch; do
             echo "Import mipsel specific patch: $(basename $patch)"
@@ -175,11 +175,11 @@ apply_patches() {
 print_build_info() {
 cat <<EOF
 We're working on
-    pkgname:		$pkgname
-    workdir:		$workdir
-    changelog:		$changelog
-    CL:			$cl
-    repository:		$repository
+    pkgname:        $pkgname
+    workdir:        $workdir
+    changelog:      $changelog
+    CL:         $cl
+    repository:     $repository
 EOF
 }
 
@@ -188,53 +188,53 @@ EOF
 OPTS=$(getopt -n build-package -o 'c:l:n:w:bhv' \
           --long changelog:,cl:,pkgname:,workdir:,build,help,version -- "$@")
 
-[[ $? -eq 0 ]] || die "Something went wrong!!!"
+[[ $? -eq 0 ]] || die "Sorry! I don't understand!!!"
 
 eval set -- "${OPTS}"
 
 while : ; do
     case $1 in
         -c|--changelog)
-        changelog=$2
-        shift 2
-        ;;
+            changelog=$2
+            shift 2
+            ;;
         -l|--cl)
-        if [[ $2 =~ [0-9]+ ]]; then
-            cl=$2
-        else
-            echo "CL is ilegal"
-            exit 3
-        fi
-        shift 2
-        ;;
+            if [[ $2 =~ [0-9]+ ]]; then
+                cl=$2
+            else
+                echo "CL is ilegal"
+                exit 3
+            fi
+            shift 2
+            ;;
         -n|--pkgname)
-        pkgname=$2
-        shift 2
-        ;;
+            pkgname=$2
+            shift 2
+            ;;
         -w|--workdir)
-        workdir=${WORKBASE}/${2}
-        shift 2
-        ;;
-            -b|--build)
-        do_build=0
-        shift
-        ;;
-            -v|--version)
-        printVersion
-        shift
-        ;;
+            workdir=${WORKBASE}/${2}
+            shift 2
+            ;;
+        -b|--build)
+            do_build=0
+            shift
+            ;;
+        -v|--version)
+            printVersion
+            shift
+            ;;
         -h|--help)
-        printHelp
-        shift
-        ;;
+            printHelp
+            shift
+            ;;
         --)
-        shift
-        break
-        ;;
+            shift
+            break
+            ;;
         *)
-        printHelp
-        shift
-        ;;
+            printHelp
+            shift
+            ;;
     esac
 done
 
