@@ -161,6 +161,7 @@ fixBuildDeps() {
 fixDebuildOptions() {
     if pkgIsDebianized ; then
         if grep -wqs golang-go debian/control
+            echo "Golang package detected, trying to fix debuild options"
             BOPTS+=" -e USE_GGCGO=1 -e CGO_ENABLED=1"
         fi
 
