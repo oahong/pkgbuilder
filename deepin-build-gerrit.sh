@@ -8,7 +8,7 @@ set -e
 declare -r WORKBASE=/mnt/packages
 declare -r BASEURI='http://cr.deepin.io'
 declare -r REPOBASE=${WORKBASE}/git-repos
-declare -r BOPTS="-e USE_GGCGO=1 -e CGO_ENABLED=1 -us -uc -sa -j8"
+declare -r BOPTS="-us -uc -sa -j8"
 declare -r SVERSION="v0.0.1"
 declare PKGVER=
 
@@ -155,6 +155,17 @@ fixBuildDeps() {
     echo "Replace golang-go in build deps with gccgo-5"
     if pkgIsDebianized ; then
         sed -e 's@golang-go\s*,@gccgo-5 | &@g' -i debian/control
+    fi
+}
+
+fixDebuildOptions() {
+    if pkgIsDebianized ; then
+        if grep -wqs golang-go debian/control
+            BOPTS+=" -e USE_GGCGO=1 -e CGO_ENABLED=1"
+        fi
+
+        [[ $pkgname == dde-file-manager-backend ]] && \
+            BOPTS+=" -e CGO_LDTHREAD=-lpthread"
     fi
 }
 
@@ -315,6 +326,7 @@ build_package() {
 
     apply_patches
     fixBuildDeps
+    fixDebuildOptions
 
     if [[ $do_build -eq 0 ]] ; then
         dch -v ${PKGVER} -D unstable $changelog
