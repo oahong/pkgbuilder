@@ -326,3 +326,5 @@ build_package() {
 make_orig_tarball
 prepare_build
 build_package
+
+# vim: number tabstop=4 softtabstop=4 expandtab
