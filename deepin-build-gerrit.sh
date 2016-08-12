@@ -38,8 +38,9 @@ declare -r raccoon_components=(
     dde-dock
     dde-launcher
     dde-session-ui
-    deepin-desktop-schemas
     deepin-desktop-base
+    deepin-desktop-schemas
+    startdde
 )
 
 printVersion() {
