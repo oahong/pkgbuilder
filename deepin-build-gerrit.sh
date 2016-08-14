@@ -297,7 +297,11 @@ createdir $REPOBASE
 if [[ $(contains $pkgname ${dde_components[@]}) -eq 0 ]]; then
     repository=${BASEURI}/dde/${pkgname}
 else
-    repository=${BASEURI}/${pkgname}
+    if [[ ${pkgname} = lastore-daemon* ]]; then
+        repository=${BASEURI}/lastore/${pkgname}
+    else
+        repository=${BASEURI}/${pkgname}
+    fi
 fi
 
 [[ ${pkgname} == deepin-default-settings ]] && \
