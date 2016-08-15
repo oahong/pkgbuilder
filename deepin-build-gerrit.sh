@@ -12,6 +12,7 @@ declare -r SVERSION="v0.0.1"
 declare -r DPKGBOPTIONS="-us -uc -sa -j8"
 declare -i CHANGELIST=
 
+declare targetbranch=master
 declare BOPTS=
 declare PKGVER=
 
@@ -53,20 +54,21 @@ printVersion() {
 printHelp() {
     cat <<EOF >&2
 Usage:
-  $0 [-c changelog] [-l clnumber] -n pkgname [-w workdir] [-b] [-h] [-v]
+  $0 [-c CHANGELOG] [-l NUMBER] -n PKGNAME [-t BRANCH] [-w WORKDIR] [-b] [-h] [-v]
 
 Build script for deepin mipsel package team
 
 Help Options:
   -h, --help            Show help options
 Application Options:
-  -c, --changelog=CHANGE    Use CHANGE as debian package changelog      
-  -l, --cl=NUMBER           Build package based on a CL: NUMBER
-  -n, --pkgname=PKGNAME     Build PKGNAME
-  -w, --workdir=DIR         Override the default workdir
-  -b, --build               Start the real build, otherwise the script will
-                            just do preparation for a package build
-  -v, --version             Show version
+  -c, --changelog=CHANGELOG    Use CHANGELOG as debian package changelog
+  -l, --cl=NUMBER              Build package based on a CL: NUMBER
+  -n, --pkgname=PKGNAME        Build PKGNAME
+  -t, --target-branch=BRANCH   Check out to specific BRANCH
+  -w, --workdir=DIR            Override the default WORKDIR
+  -b, --build                  Start the real build, otherwise the script will
+                               just do preparation for a package build
+  -v, --version                Show version
 EOF
     exit 0
 }
@@ -88,7 +90,7 @@ has_bin() {
 configGitReview() {
     echo "create per project gitreview configuration"
     if [[ ! -f .gitreview ]] ; then
-        cat <<EOF > .gitreview 
+        cat <<EOF > .gitreview
 [gerrit]
 defaultremote = origin
 EOF
@@ -258,8 +260,8 @@ while : ; do
             workdir=${WORKBASE}/${2}
             shift 2
             ;;
-        -B|--workbranch)
-            workbranch=$2
+        -t|--target-branch)
+            targetbranch=$2
             shift 2
             ;;
         -b|--build)
@@ -311,20 +313,18 @@ fi
 patchdir=${WORKBASE}/patches/${pkgname}
 
 make_orig_tarball() {
-    if [ x${workbranch} = x"" ] ;then
-        workbranch=master
-    fi
-    
-    local work_branch=${workbranch}
+    local work_branch=${targetbranch}
     local repodir=${REPOBASE}/${pkgname}
     local has_raccoon=$(contains ${pkgname} ${raccoon_components[@]})
 
     if [[ $has_raccoon -eq 0 ]] ; then
         work_branch=raccoon
-    else
-        work_branch=${workbranch}
+        if [[ $work_branch != $targetbranch ]] ; then
+            echo -e "\n\n\n\t\tworking branch is not the target branch\n\n\n"
+        fi
     fi
-    echo "Work branch is $work_branch"
+
+    echo "Current branch is $work_branch"
 
     has_bin git || die "No git package in the system"
 
@@ -344,7 +344,7 @@ make_orig_tarball() {
     assert revision
 
     if [[ -z ${tag} ]] ;then
-        echo "tag fallback to 0.1"  
+        echo "tag fallback to 0.1"
         tag=0.1
     fi
     assert tag
