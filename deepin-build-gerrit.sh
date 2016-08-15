@@ -33,6 +33,7 @@ declare -r dde_components=(
 
 declare -r raccoon_components=(
     dbus-factory
+    dde-api
     dde-control-center
     dde-daemon
     dde-desktop
@@ -117,7 +118,7 @@ popd() {
 }
 
 contains() {
-    local element
+    local element=
     local result=1
     for element in ${@:2}; do
     if [[ $element == $1 ]] ; then
@@ -323,6 +324,7 @@ make_orig_tarball() {
     else
         work_branch=${workbranch}
     fi
+    echo "Work branch is $work_branch"
 
     has_bin git || die "No git package in the system"
 
