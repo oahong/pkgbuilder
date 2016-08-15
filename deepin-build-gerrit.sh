@@ -387,6 +387,7 @@ build_package() {
 
     if [[ $do_build -eq 0 ]] ; then
         dch -v ${PKGVER} -D unstable $changelog
+        echo "Debuild options: ${BOPTS} ${DPKGBOPTIONS}"
         debuild ${BOPTS} ${DPKGBOPTIONS}
     fi
     popd
