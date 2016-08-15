@@ -53,7 +53,7 @@ printVersion() {
 printHelp() {
     cat <<EOF >&2
 Usage:
-  $0 [-c changelog] [-l clnumber] -n pkgname -w workdir [-b] [-h] [-v]
+  $0 [-c changelog] [-l clnumber] -n pkgname [-w workdir] [-b] [-h] [-v]
 
 Build script for deepin mipsel package team
 
