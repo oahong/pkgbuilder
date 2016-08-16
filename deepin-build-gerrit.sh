@@ -1,21 +1,25 @@
 #! /bin/bash
 # TODO:
 #   1. rewrite
-#   2. add gerrit/git-review support
-#   3. pbuilder/cowbuilder support
+#   2. cowbuilder support
+#   3. git-buildpackage
+# Features:
+#   1. gerrit/git-review support
+#   2. pbuilder support
 
 set -e
 
 declare -r WORKBASE=/mnt/packages
-declare -r BASEURI='http://cr.deepin.io'
+declare -r BASEURI=http://cr.deepin.io
 declare -r REPOBASE=${WORKBASE}/git-repos
 declare -r SVERSION="v0.0.1"
 declare -r DPKGBOPTIONS="-us -uc -sa -j8"
 declare -i CHANGELIST=
 
-declare targetbranch=master
 declare BOPTS=
 declare PKGVER=
+declare -i usepbuilder=1
+declare targetbranch=master
 
 declare -r dde_components=(
     dde-account-faces
@@ -55,7 +59,7 @@ printVersion() {
 printHelp() {
     cat <<EOF >&2
 Usage:
-  $0 [-c CHANGELOG] [-l NUMBER] -n PKGNAME [-t BRANCH] [-w WORKDIR] [-b] [-h] [-v]
+  $0 [-c CHANGELOG] [-l NUMBER] -n PKGNAME [-t BRANCH] [-w WORKDIR] [-b|-p] [-h] [-v]
 
 Build script for deepin mipsel package team
 
@@ -67,9 +71,12 @@ Application Options:
   -n, --pkgname=PKGNAME        Build PKGNAME
   -t, --target-branch=BRANCH   Check out to specific BRANCH
   -w, --workdir=DIR            Override the default WORKDIR
-  -b, --build                  Start the real build, otherwise the script will
-                               just do preparation for a package build
+  -b, --build                  Perform a package build using debuild
+  -p, --pbuilder               Perform a package build using pbuilder (recommended for a clean buid)
   -v, --version                Show version
+
+Note:
+Unless -p or -b option is specified, otherwise the script will help you to prepare for a package building
 EOF
     exit 0
 }
@@ -241,6 +248,35 @@ apply_patches() {
     fi
 }
 
+hasPbuilderChroot() {
+    if [[ -f ${WORKBASE}/deepin-base.tgz ]] ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+initializePbuilder() {
+    has_bin pbuilder || die "Install pbuilder!!!"
+
+    # Should I use options instead of configuration?
+    echo "Initialize pbuilder configuration"
+
+    if [[ ! -f ${HOME}/.pbuilderrc ]] ; then
+    cat <<EOF > ${HOME}/.pbuilderrc
+AUTO_DEBSIGN=no
+BINDMOUNT="$WORKBASE"
+MIRRORSITE="http://192.168.1.135/debian-mipsel"
+OTHERMIRROR="deb http://pools.corp.deepin.com/mipsel-experimental unstable main | deb http://192.168.1.135/mipsel-staging raccoon main"
+ALLOWUNTRUSTED=yes
+DEBOOTSTRAPOPTS=( '--variant=buildd' '--no-check-gpg' )
+EOF
+    fi
+
+    createdir ${WORKBASE}/deepin-chroot
+    sudo pbuilder create ${PBUILDEROPTS[@]}
+}
+
 print_build_info() {
 cat <<EOF
 We're working on
@@ -254,8 +290,8 @@ EOF
 
 [[ $EUID -eq 0 ]] && die "Don't build package with priviledged users"
 
-OPTS=$(getopt -n build-package -o 'c:l:n:B:w:bhv' \
-          --long changelog:,cl:,pkgname:,workdir:,build,help,version -- "$@")
+OPTS=$(getopt -n build-package -o 'c:l:n:B:w:bhpv' \
+          --long changelog:,cl:,pkgname:,workdir:,build,help,pbuilder,version -- "$@")
 
 [[ $? -eq 0 ]] || die "Sorry! I don't understand!!!"
 
@@ -275,6 +311,10 @@ while : ; do
         -n|--pkgname)
             pkgname=$2
             shift 2
+            ;;
+        -p|--pbuilder)
+            usepbuilder=0
+            shift
             ;;
         -w|--workdir)
             workdir=${WORKBASE}/${2}
@@ -308,6 +348,13 @@ while : ; do
 done
 
 assert pkgname
+
+declare -ar PBUILDEROPTS=(
+    "--buildresult ${WORKBASE}/${pkgname}"
+    "--basetgz ${WORKBASE}/deepin-base.tgz"
+    "--buildplace ${WORKBASE}/deepin-chroot"
+    "--hookdir   ${WORKBASE}/buildpkg/pbuilder-hook.d"
+)
 
 # sane default values
 [[ -z $workdir ]]      && workdir=${WORKBASE}/${pkgname}
@@ -409,8 +456,15 @@ build_package() {
 
     if [[ $do_build -eq 0 ]] ; then
         dch -v ${PKGVER} -D unstable $changelog
-        echo "Debuild options: ${BOPTS} ${DPKGBOPTIONS}"
-        eval debuild ${BOPTS} ${DPKGBOPTIONS}
+        if [[ $usepbuilder -eq 0 ]] ; then
+            export ${BOPTS}
+            hasPbuilderChroot || initializePbuilder
+            eval pdebuild --use-pdebuild-internal --debbuildopts '"${DPKGBOPTIONS}"' \
+		-- ${PBUILDEROPTS[@]}
+        else
+            echo "Debuild options: ${BOPTS} ${DPKGBOPTIONS}"
+            eval debuild ${BOPTS} ${DPKGBOPTIONS}
+        fi
     fi
     popd
 }
