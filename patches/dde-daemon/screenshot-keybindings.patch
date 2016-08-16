@@ -1,0 +1,28 @@
+Description: Prefer gnome-screenshot over deepin-screenshot on mipsel
+
+--- dde-daemon-3.0.17+git20160808~a5f91f.orig/misc/dde-daemon/keybinding/system_actions.json
++++ dde-daemon-3.0.17+git20160808~a5f91f/misc/dde-daemon/keybinding/system_actions.json
+@@ -26,19 +26,19 @@
+ 	},
+ 	{
+ 		"Key": "screenshot",
+-		"Action": "deepin-screenshot"
++		"Action": "gnome-screenshot -a"
+ 	},
+ 	{
+ 		"Key": "screenshot-fullscreen",
+-		"Action": "deepin-screenshot -f"
++		"Action": "gnome-screenshot"
+ 	},
+ 	{
+ 		"Key": "screenshot-window",
+-		"Action": "deepin-screenshot -w"
++		"Action": "gnome-screenshot -w"
+ 	},
+ 	{
+ 		"Key": "screenshot-delayed",
+-		"Action": "deepin-screenshot -d 5"
++		"Action": "gnome-screenshot -d 5"
+ 	},
+ 	{
+ 		"Key": "file-manager",

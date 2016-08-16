@@ -1,0 +1,24 @@
+From 5d3e1c582ae461ed9e744491cd8f7510210c61e2 Mon Sep 17 00:00:00 2001
+From: Hong Hao <oahong@gmail.com>
+Date: Thu, 11 Aug 2016 12:56:31 +0800
+Subject: [PATCH 1/2] mips: nautilus in the docked_app list has been replaced
+ by dde-file-manager
+
+Change-Id: I3a78376a88e9ab05123399b325bb9a64dd67b62b
+---
+ overrides/mips/com.deepin.dde.dock.override | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/overrides/mips/com.deepin.dde.dock.override b/overrides/mips/com.deepin.dde.dock.override
+index c66c3b6..7cd32db 100644
+--- a/overrides/mips/com.deepin.dde.dock.override
++++ b/overrides/mips/com.deepin.dde.dock.override
+@@ -1,4 +1,4 @@
+ [com.deepin.dde.dock]
+-docked-apps=['deepin-toggle-desktop', 'deepin-wm-multitaskingview','org.gnome.nautilus','audacious-qt','smplayer','firefox','wps-office-wps','wps-office-wpp','wps-office-et','dde-control-center']
++docked-apps=['deepin-toggle-desktop', 'deepin-wm-multitaskingview','dde-file-manager','audacious-qt','smplayer','firefox','wps-office-wps','wps-office-wpp','wps-office-et','dde-control-center']
+ hide-mode='keep-showing'
+ display-mode='efficient'
+-- 
+2.9.0
+

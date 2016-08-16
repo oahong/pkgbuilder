@@ -1,0 +1,9 @@
+mips: Disable default hot corners settings
+--- /dev/null
++++ b/overrides/mips/com.deepin.dde.zone.override
+@@ -0,0 +1,5 @@
++[com.deepin.dde.zone]
++left-down=''
++left-up=''
++right-down=''
++right-up=''
