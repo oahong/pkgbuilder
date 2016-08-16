@@ -196,12 +196,12 @@ fixDebuildOptions() {
     if pkgIsDebianized ; then
         if grep -wqs golang-go debian/control ; then
             echo "Golang package detected, trying to fix debuild option"
-            BOPTS+=" -e USE_GGCGO=1 -e CGO_ENABLED=1"
+            BOPTS+="-e USE_GGCGO=1 -e CGO_ENABLED=1 "
         fi
     fi
 
     [[ $pkgname == deepin-file-manager-backend ]] && \
-        BOPTS+=" -e CGO_LDTHREAD=-lpthread"
+        BOPTS+="-e CGO_LDTHREAD=-lpthread"
 
     # pkgname test maybe fail, force return true
     return 0
@@ -382,7 +382,7 @@ build_package() {
     pushd ${workdir}/${pkgname}-${PKGVER}
 
     # Apply patches unless build official package (Not from any CL)
-    [[ -n $CHANGELIST ]] && apply_patches
+    [[ $CHANGELIST -eq 0 ]] && apply_patches
 
     fixBuildDeps
     fixDebuildOptions
@@ -390,7 +390,7 @@ build_package() {
     if [[ $do_build -eq 0 ]] ; then
         dch -v ${PKGVER} -D unstable $changelog
         echo "Debuild options: ${BOPTS} ${DPKGBOPTIONS}"
-        debuild ${BOPTS} ${DPKGBOPTIONS}
+        eval debuild ${BOPTS} ${DPKGBOPTIONS}
     fi
     popd
 }
