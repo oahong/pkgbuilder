@@ -2,6 +2,7 @@
 # TODO:
 #   1. rewrite
 #   2. add gerrit/git-review support
+#   3. pbuilder/cowbuilder support
 
 set -e
 
