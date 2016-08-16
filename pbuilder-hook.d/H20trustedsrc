@@ -1,0 +1,6 @@
+#!/bin/bash
+#
+# Trust all sources, since we didn't sign any deb on mipsel port
+
+echo ' set trusted sources list'
+sed -e 's/deb http/deb [trusted=yes] http/g' -i /etc/apt/sources.list
