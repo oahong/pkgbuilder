@@ -270,9 +270,18 @@ MIRRORSITE="http://192.168.1.135/debian-mipsel"
 OTHERMIRROR="deb http://pools.corp.deepin.com/mipsel-experimental unstable main|deb http://192.168.1.135/mipsel-staging raccoon main"
 ALLOWUNTRUSTED=yes
 DEBOOTSTRAPOPTS=( '--variant=buildd' '--no-check-gpg' )
+EXTRAPACKAGES="lintian gccgo-5"
+APTCACHEHARDLINK=no
 EOF
 
     createdir ${WORKBASE}/deepin-chroot
+
+    if grep -wqs deepin-chroot /proc/mounts ; then
+        cat <<EOF>&2
+To speed up build operation, mounting tmpfs to ${WORKBASE}/deepin-chroot
+is recommended
+EOF
+    fi
 
     sudo pbuilder create ${PBUILDEROPTS[@]} ${PBUILDEREXTRAOPTS[@]}
 }
