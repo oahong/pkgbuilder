@@ -57,7 +57,7 @@ printVersion() {
 printHelp() {
     cat <<EOF >&2
 Usage:
-  $0 [-c NUMBER] [-l CHANGELOG] -n PACKAGE [-t BRANCH] [-w WORKDIR] [-b|-p] [-h] [-v]
+  $0 [-c NUMBER] [-l CHANGELOG] -n PACKAGE [-t BRANCH] [-u HOST] [-w WORKDIR] [-b|-p] [-h] [-v]
 
 Build script for deepin mipsel package team
 
@@ -68,6 +68,8 @@ Application Options:
   -l, --changelog=CHANGELOG    Use CHANGELOG as debian package changelog
   -n, --package=PACKAGE        Build PACKAGE
   -t, --target-branch=BRANCH   Check out to specific BRANCH
+  -u, --upload=HOST            Upload build artifacts to HOST, you should
+                               define HOST in dput config
   -w, --workdir=DIR            Override the default WORKDIR
   -b, --build                  Perform a package build using debuild
   -p, --pbuilder               Perform a package build using pbuilder
@@ -80,6 +82,7 @@ $0 will not issue any build command (pbuilder or debuild) unless -p or -b option
 Examples:
   $0 -n dde-desktop                            Prepare for building dde-destop
   $0 -n dde-desktop -b                         Build dde-desktop from scratch
+  $0 -n dde-desktop -b -u staging              Build dde-desktop then upload to staging
   $0 -n dde-api -p -n "Rebuild for testing"    Build dde-api in a clean pbuilder chroot
 EOF
     exit 0
@@ -331,6 +334,10 @@ while : ; do
             targetbranch=$2
             shift 2
             ;;
+        -u|--upload)
+            uhost=$2
+            shift 2
+            ;;
         -w|--workdir)
             workdir=${WORKBASE}/${2}
             shift 2
@@ -496,8 +503,16 @@ build_package() {
     popd
 }
 
+upload_package() {
+    [[ -z $uhost ]] && return 0
+    pushd "${WORKDIR}"
+    dput -uf ${uhost} ${package}_${PKGVER}_mipsel.changes
+    popd
+}
+
 make_orig_tarball
 prepare_build
 build_package
+upload_package
 
 # vim: number tabstop=4 softtabstop=4 expandtab
