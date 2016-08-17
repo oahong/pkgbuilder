@@ -472,7 +472,9 @@ build_package() {
     fixDebuildOptions
 
     if [[ $do_build -eq 0 ]] ; then
-        dch -v ${PKGVER} -D unstable $changelog
+        export DEBEMAIL="mips@deepin.com"
+        export DEBFULLNAME="Deepin/MIPS Team"
+        dch -v ${PKGVER} -D unstable "${changelog}"
         if [[ $usepbuilder -eq 0 ]] ; then
             export ${BOPTS//-e}
             hasPbuilderChroot || initializePbuilder
