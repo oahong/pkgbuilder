@@ -76,7 +76,7 @@ Application Options:
   -v, --version                Show version
 
 Note:
-Unless -p or -b option is specified, otherwise the script will help you to prepare for a package building
+$0 will not issue any build command (pbuilder or debuild) unless -p or -b option is specified.
 EOF
     exit 0
 }
