@@ -116,7 +116,7 @@ downloadGerritChange() {
     if has_bin git-review ; then
         git review -d $1
     else
-        die "No git-review package in the system!!!"
+        die "Missing git-review in the system!!!"
     fi
 }
 
@@ -423,7 +423,7 @@ make_orig_tarball() {
 
     echo "Current branch is $work_branch"
 
-    has_bin git || die "No git package in the system"
+    has_bin git || die "Missing git in the system!!!"
 
     # fetch git repository
     [[ -d ${repodir}/.git ]] || git clone -b ${work_branch} ${repository} ${repodir}
@@ -505,9 +505,8 @@ build_package() {
 
 upload_package() {
     [[ -z $uhost ]] && return 0
-    pushd "${WORKDIR}"
-    dput -uf ${uhost} ${package}_${PKGVER}_mipsel.changes
-    popd
+    has_bin dput || die "Missing dput in the system!!!"
+    dput -uf ${uhost} ${workdir}/${package}_${PKGVER}_mipsel.changes
 }
 
 make_orig_tarball
