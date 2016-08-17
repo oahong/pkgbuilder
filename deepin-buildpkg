@@ -59,7 +59,7 @@ printVersion() {
 printHelp() {
     cat <<EOF >&2
 Usage:
-  $0 [-c CHANGELOG] [-l NUMBER] -n PKGNAME [-t BRANCH] [-w WORKDIR] [-b|-p] [-h] [-v]
+  $0 [-c CHANGELOG] [-l NUMBER] -n PACKAGE [-t BRANCH] [-w WORKDIR] [-b|-p] [-h] [-v]
 
 Build script for deepin mipsel package team
 
@@ -68,7 +68,7 @@ Help Options:
 Application Options:
   -c, --changelog=CHANGELOG    Use CHANGELOG as debian package changelog
   -l, --cl=NUMBER              Build package based on a CL: NUMBER
-  -n, --pkgname=PKGNAME        Build PKGNAME
+  -n, --package=PACKAGE        Build PACKAGE
   -t, --target-branch=BRANCH   Check out to specific BRANCH
   -w, --workdir=DIR            Override the default WORKDIR
   -b, --build                  Perform a package build using debuild
@@ -77,6 +77,11 @@ Application Options:
 
 Note:
 $0 will not issue any build command (pbuilder or debuild) unless -p or -b option is specified.
+
+Examples:
+  $0 -n dde-desktop                            Prepare for building dde-destop
+  $0 -n dde-desktop -b                         Build dde-desktop from scratch
+  $0 -n dde-api -p -n "Rebuild for testing"    Build dde-api in a clean pbuilder chroot
 EOF
     exit 0
 }
@@ -197,7 +202,7 @@ debsrcFormatter() {
     fi
 
     if [[ $sformat =~ 3.0[[:space:]]\((native|quilt)\) ]] ; then
-    echo "${pkgname} has debsrc 3.0 format: $sformat"
+    echo "${package} has debsrc 3.0 format: $sformat"
     fi
 
     if has_patch; then
@@ -227,10 +232,10 @@ fixDebuildOptions() {
         fi
     fi
 
-    [[ $pkgname == deepin-file-manager-backend ]] && \
+    [[ $package == deepin-file-manager-backend ]] && \
         BOPTS+="-e CGO_LDTHREAD=-lpthread"
 
-    # pkgname test maybe fail, force return true
+    # package test maybe fail, force return true
     return 0
 }
 
@@ -289,7 +294,7 @@ EOF
 print_build_info() {
 cat <<EOF
 We're working on
-    pkgname:        $pkgname
+    package:        $package
     workdir:        $workdir
     changelog:      $changelog
     CL:             $CHANGELIST
@@ -300,7 +305,7 @@ EOF
 [[ $EUID -eq 0 ]] && die "Don't build package with priviledged user"
 
 OPTS=$(getopt -n build-package -o 'c:l:n:B:w:bhpv' \
-          --long changelog:,cl:,pkgname:,workdir:,build,help,pbuilder,version -- "$@")
+          --long changelog:,cl:,package:,workdir:,build,help,pbuilder,version -- "$@")
 
 [[ $? -eq 0 ]] || die "Sorry! I don't understand!!!"
 
@@ -317,8 +322,8 @@ while : ; do
             [[ $CHANGELIST -eq 0 ]] && die "CL $CHANGELIST is illegal"
             shift 2
             ;;
-        -n|--pkgname)
-            pkgname=$2
+        -n|--package)
+            package=$2
             shift 2
             ;;
         -p|--pbuilder)
@@ -356,7 +361,7 @@ while : ; do
     esac
 done
 
-assert pkgname
+assert package
 
 scriptdir=$(dirname $(readlink -ef $0))
 
@@ -370,36 +375,36 @@ declare -ar PBUILDEROPTS=(
 
 # buildresult must be specifed as pdebuild option
 declare -r PBUILDEREXTRAOPTS=(
-    "--buildresult  ${WORKBASE}/${pkgname}"
+    "--buildresult  ${WORKBASE}/${package}"
 )
 
 # sane default values
-[[ -z $workdir ]]      && workdir=${WORKBASE}/${pkgname}
+[[ -z $workdir ]]      && workdir=${WORKBASE}/${package}
 [[ -z $changelog ]]    && changelog="Rebuild on mipsel"
 
 createdir $workdir
 createdir $REPOBASE
 
 # set git repository
-if [[ $(contains $pkgname ${dde_components[@]}) -eq 0 ]]; then
-    repository=${BASEURI}/dde/${pkgname}
+if [[ $(contains $package ${dde_components[@]}) -eq 0 ]]; then
+    repository=${BASEURI}/dde/${package}
 else
-    if [[ ${pkgname} = lastore-daemon* ]]; then
-        repository=${BASEURI}/lastore/${pkgname}
+    if [[ ${package} = lastore-daemon* ]]; then
+        repository=${BASEURI}/lastore/${package}
     else
-        repository=${BASEURI}/${pkgname}
+        repository=${BASEURI}/${package}
     fi
 fi
 
-[[ ${pkgname} == deepin-default-settings ]] && \
-    repository=${BASEURI}/${pkgname##deepin-}
+[[ ${package} == deepin-default-settings ]] && \
+    repository=${BASEURI}/${package##deepin-}
 
-patchdir=${WORKBASE}/patches/${pkgname}
+patchdir=${WORKBASE}/patches/${package}
 
 make_orig_tarball() {
     local work_branch=${targetbranch}
-    local repodir=${REPOBASE}/${pkgname}
-    local has_raccoon=$(contains ${pkgname} ${raccoon_components[@]})
+    local repodir=${REPOBASE}/${package}
+    local has_raccoon=$(contains ${package} ${raccoon_components[@]})
 
     if [[ $has_raccoon -eq 0 ]] ; then
         work_branch=raccoon
@@ -442,28 +447,28 @@ make_orig_tarball() {
         PKGVER=$tag+r${revision}~${commit_id}
     fi
 
-    echo "Create ${pkgname} upstream source tarball..."
-    git archive --format=tar --prefix=${pkgname}-${PKGVER}/ HEAD | \
-        xz -z > ${workdir}/${pkgname}_${PKGVER}.orig.tar.xz
+    echo "Create ${package} upstream source tarball..."
+    git archive --format=tar --prefix=${package}-${PKGVER}/ HEAD | \
+        xz -z > ${workdir}/${package}_${PKGVER}.orig.tar.xz
 
     popd
 }
 
 prepare_build() {
-    rm -rf ${workdir}/${pkgname}-${PKGVER}
+    rm -rf ${workdir}/${package}-${PKGVER}
     pushd ${workdir}
-    tar xf ${pkgname}_${PKGVER}.orig.tar.xz
+    tar xf ${package}_${PKGVER}.orig.tar.xz
     popd
 
-    pushd ${workdir}/${pkgname}-${PKGVER}
+    pushd ${workdir}/${package}-${PKGVER}
     if ! pkgIsDebianized ; then
-        cp -a ${WORKBASE}/pkg_debian/${pkgname}/debian .
+        cp -a ${WORKBASE}/pkg_debian/${package}/debian .
     fi
     popd
 }
 
 build_package() {
-    pushd ${workdir}/${pkgname}-${PKGVER}
+    pushd ${workdir}/${package}-${PKGVER}
 
     # Apply patches unless build official package (Not from any CL)
     [[ $CHANGELIST -eq 0 ]] && apply_patches
