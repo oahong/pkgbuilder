@@ -351,6 +351,7 @@ assert pkgname
 scriptdir=$(dirname $(readlink -ef $0))
 
 declare -ar PBUILDEROPTS=(
+    "--distribution unstable"
     "--buildresult  ${WORKBASE}/${pkgname}"
     "--basetgz      ${WORKBASE}/deepin-base.tgz"
     "--buildplace   ${WORKBASE}/deepin-chroot"
