@@ -239,7 +239,7 @@ apply_patches() {
         die "You should debianize your package, workdir: $PWD!!!"
 
     if has_patch $patchdir ; then
-    debsrcFormatter
+        debsrcFormatter
 
         for patch in $patchdir/*.patch; do
             echo "Import mipsel specific patch: $(basename $patch)"
@@ -267,13 +267,14 @@ initializePbuilder() {
 AUTO_DEBSIGN=no
 BINDMOUNT="$WORKBASE"
 MIRRORSITE="http://192.168.1.135/debian-mipsel"
-OTHERMIRROR="deb http://pools.corp.deepin.com/mipsel-experimental unstable main | deb http://192.168.1.135/mipsel-staging raccoon main"
+OTHERMIRROR="deb http://pools.corp.deepin.com/mipsel-experimental unstable main|deb http://192.168.1.135/mipsel-staging raccoon main"
 ALLOWUNTRUSTED=yes
 DEBOOTSTRAPOPTS=( '--variant=buildd' '--no-check-gpg' )
 EOF
 
     createdir ${WORKBASE}/deepin-chroot
-    sudo pbuilder create ${PBUILDEROPTS[@]}
+
+    sudo pbuilder create ${PBUILDEROPTS[@]} ${PBUILDEREXTRAOPTS[@]}
 }
 
 print_build_info() {
@@ -352,11 +353,15 @@ scriptdir=$(dirname $(readlink -ef $0))
 
 declare -ar PBUILDEROPTS=(
     "--distribution unstable"
-    "--buildresult  ${WORKBASE}/${pkgname}"
     "--basetgz      ${WORKBASE}/deepin-base.tgz"
     "--buildplace   ${WORKBASE}/deepin-chroot"
     "--hookdir      ${scriptdir}/pbuilder-hook.d"
     "--configfile   ${scriptdir}/pbuilderrc"
+)
+
+# buildresult must be specifed as pdebuild option
+declare -r PBUILDEREXTRAOPTS=(
+    "--buildresult  ${WORKBASE}/${pkgname}"
 )
 
 # sane default values
@@ -462,8 +467,10 @@ build_package() {
         if [[ $usepbuilder -eq 0 ]] ; then
             export ${BOPTS//-e}
             hasPbuilderChroot || initializePbuilder
-            eval pdebuild --use-pdebuild-internal --debbuildopts '"${DPKGBOPTIONS}"' \
-		-- ${PBUILDEROPTS[@]}
+            eval pdebuild --use-pdebuild-internal  \
+                --debbuildopts '"${DPKGBOPTIONS}"' \
+                ${PBUILDEREXTRAOPTS[@]}            \
+                -- ${PBUILDEROPTS[@]}
         else
             echo "Debuild options: ${BOPTS} ${DPKGBOPTIONS}"
             eval debuild ${BOPTS} ${DPKGBOPTIONS}
