@@ -1,0 +1,10 @@
+#! /bin/bash
+#
+# mipsel-experimental must have have a higher priority
+# to override package from mipsel-debian repository
+
+cat <<'EOF' > /etc/apt/preferences.d/experimental
+Package: *
+Pin: origin pools.corp.deepin.com
+Pin-Priority: 800
+EOF
