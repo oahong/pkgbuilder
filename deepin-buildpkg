@@ -13,13 +13,11 @@ declare -r WORKBASE=/mnt/packages
 declare -r BASEURI=http://cr.deepin.io
 declare -r REPOBASE=${WORKBASE}/git-repos
 declare -r SVERSION="v0.0.1"
-declare -r DPKGBOPTIONS="-us -uc -sa -j8"
+declare -r DBPKGOPTS="-us -uc -sa -j8"
 declare -i CHANGELIST=
 
 declare BOPTS=
 declare PKGVER=
-declare -i usepbuilder=1
-declare targetbranch=master
 
 declare -r dde_components=(
     dde-account-faces
@@ -59,20 +57,21 @@ printVersion() {
 printHelp() {
     cat <<EOF >&2
 Usage:
-  $0 [-c CHANGELOG] [-l NUMBER] -n PACKAGE [-t BRANCH] [-w WORKDIR] [-b|-p] [-h] [-v]
+  $0 [-c NUMBER] [-l CHANGELOG] -n PACKAGE [-t BRANCH] [-w WORKDIR] [-b|-p] [-h] [-v]
 
 Build script for deepin mipsel package team
 
 Help Options:
   -h, --help            Show help options
 Application Options:
-  -c, --changelog=CHANGELOG    Use CHANGELOG as debian package changelog
-  -l, --cl=NUMBER              Build package based on a CL: NUMBER
+  -c, --cl=NUMBER              Build package based on a CL: NUMBER
+  -l, --changelog=CHANGELOG    Use CHANGELOG as debian package changelog
   -n, --package=PACKAGE        Build PACKAGE
   -t, --target-branch=BRANCH   Check out to specific BRANCH
   -w, --workdir=DIR            Override the default WORKDIR
   -b, --build                  Perform a package build using debuild
-  -p, --pbuilder               Perform a package build using pbuilder (recommended for a clean buid)
+  -p, --pbuilder               Perform a package build using pbuilder
+                               (recommended for a clean buid)
   -v, --version                Show version
 
 Note:
@@ -304,8 +303,10 @@ EOF
 
 [[ $EUID -eq 0 ]] && die "Don't build package with priviledged user"
 
-OPTS=$(getopt -n build-package -o 'c:l:n:B:w:bhpv' \
-          --long changelog:,cl:,package:,workdir:,build,help,pbuilder,version -- "$@")
+OPTS=$(getopt -n $0 \
+        -o 'c:l:n:t:u:w:bhpv' \
+        --long cl:,changelog:,package:,target-branch:,upload:,workdir:,build,help,pbuilder,version \
+        -- "$@")
 
 [[ $? -eq 0 ]] || die "Sorry! I don't understand!!!"
 
@@ -313,41 +314,41 @@ eval set -- "${OPTS}"
 
 while : ; do
     case $1 in
-        -c|--changelog)
-            changelog=$2
-            shift 2
-            ;;
-        -l|--cl)
+        -c|--cl)
             CHANGELIST=$2
             [[ $CHANGELIST -eq 0 ]] && die "CL $CHANGELIST is illegal"
+            shift 2
+            ;;
+        -l|--changelog)
+            changelog=$2
             shift 2
             ;;
         -n|--package)
             package=$2
             shift 2
             ;;
-        -p|--pbuilder)
-            usepbuilder=0
-            shift
+        -t|--target-branch)
+            targetbranch=$2
+            shift 2
             ;;
         -w|--workdir)
             workdir=${WORKBASE}/${2}
-            shift 2
-            ;;
-        -t|--target-branch)
-            targetbranch=$2
             shift 2
             ;;
         -b|--build)
             do_build=0
             shift
             ;;
-        -v|--version)
-            printVersion
+        -p|--pbuilder)
+            usepbuilder=0
             shift
             ;;
         -h|--help)
             printHelp
+            shift
+            ;;
+        -v|--version)
+            printVersion
             shift
             ;;
         --)
@@ -402,14 +403,14 @@ fi
 patchdir=${WORKBASE}/patches/${package}
 
 make_orig_tarball() {
-    local work_branch=${targetbranch}
+    local work_branch=${targetbranch:=master}
     local repodir=${REPOBASE}/${package}
     local has_raccoon=$(contains ${package} ${raccoon_components[@]})
 
     if [[ $has_raccoon -eq 0 ]] ; then
         work_branch=raccoon
         if [[ $work_branch != $targetbranch ]] ; then
-            echo -e "\n\n\n\t\tworking branch is not the target branch\n\n\n"
+            echo -e "\n\t\tworking branch is not the target branch\n"
         fi
     fi
 
@@ -484,12 +485,12 @@ build_package() {
             export ${BOPTS//-e}
             hasPbuilderChroot || initializePbuilder
             eval pdebuild --use-pdebuild-internal  \
-                --debbuildopts '"${DPKGBOPTIONS}"' \
+                --debbuildopts '"${DBPKGOPTS}"' \
                 ${PBUILDEREXTRAOPTS[@]}            \
                 -- ${PBUILDEROPTS[@]}
         else
-            echo "Debuild options: ${BOPTS} ${DPKGBOPTIONS}"
-            eval debuild ${BOPTS} ${DPKGBOPTIONS}
+            echo "Debuild options: ${BOPTS} ${DBPKGOPTS}"
+            eval debuild ${BOPTS} ${DBPKGOPTS}
         fi
     fi
     popd
