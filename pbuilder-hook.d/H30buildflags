@@ -1,7 +1,7 @@
 #! /bin/bash
 # change default build flags
 
-cat <<EOF > /etc/etc/dpkg/buildflags.conf
+cat <<EOF > /etc/dpkg/buildflags.conf
 APPEND CFLAGS -mips64r2
 APPEND CXXFLAGS -mips64r2
 EOF
