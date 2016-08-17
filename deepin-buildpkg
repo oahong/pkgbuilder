@@ -349,11 +349,14 @@ done
 
 assert pkgname
 
+scriptdir=$(dirname $(readlink -ef $0))
+
 declare -ar PBUILDEROPTS=(
-    "--buildresult ${WORKBASE}/${pkgname}"
-    "--basetgz ${WORKBASE}/deepin-base.tgz"
-    "--buildplace ${WORKBASE}/deepin-chroot"
-    "--hookdir   ${WORKBASE}/buildpkg/pbuilder-hook.d"
+    "--buildresult  ${WORKBASE}/${pkgname}"
+    "--basetgz      ${WORKBASE}/deepin-base.tgz"
+    "--buildplace   ${WORKBASE}/deepin-chroot"
+    "--hookdir      ${scriptdir}/pbuilder-hook.d"
+    "--configfile   ${scriptdir}/pbuilderrc"
 )
 
 # sane default values
