@@ -262,8 +262,8 @@ initializePbuilder() {
     # Should I use options instead of configuration?
     echo "Initialize pbuilder configuration"
 
-    if [[ ! -f ${HOME}/.pbuilderrc ]] ; then
-    cat <<EOF > ${HOME}/.pbuilderrc
+    # Always overwrite the configuration
+    cat <<EOF > ${scriptdir}/pbuilderrc
 AUTO_DEBSIGN=no
 BINDMOUNT="$WORKBASE"
 MIRRORSITE="http://192.168.1.135/debian-mipsel"
@@ -271,7 +271,6 @@ OTHERMIRROR="deb http://pools.corp.deepin.com/mipsel-experimental unstable main 
 ALLOWUNTRUSTED=yes
 DEBOOTSTRAPOPTS=( '--variant=buildd' '--no-check-gpg' )
 EOF
-    fi
 
     createdir ${WORKBASE}/deepin-chroot
     sudo pbuilder create ${PBUILDEROPTS[@]}
@@ -288,7 +287,7 @@ We're working on
 EOF
 }
 
-[[ $EUID -eq 0 ]] && die "Don't build package with priviledged users"
+[[ $EUID -eq 0 ]] && die "Don't build package with priviledged user"
 
 OPTS=$(getopt -n build-package -o 'c:l:n:B:w:bhpv' \
           --long changelog:,cl:,pkgname:,workdir:,build,help,pbuilder,version -- "$@")
