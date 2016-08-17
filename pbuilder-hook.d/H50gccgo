@@ -1,0 +1,3 @@
+#! /bin/bash
+
+update-alternatives --install /usr/bin/go go /usr/bin/go-5 100
