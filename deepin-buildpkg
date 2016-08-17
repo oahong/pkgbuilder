@@ -457,7 +457,7 @@ build_package() {
     if [[ $do_build -eq 0 ]] ; then
         dch -v ${PKGVER} -D unstable $changelog
         if [[ $usepbuilder -eq 0 ]] ; then
-            export ${BOPTS}
+            export ${BOPTS//-e}
             hasPbuilderChroot || initializePbuilder
             eval pdebuild --use-pdebuild-internal --debbuildopts '"${DPKGBOPTIONS}"' \
 		-- ${PBUILDEROPTS[@]}
