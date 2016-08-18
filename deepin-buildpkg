@@ -57,7 +57,7 @@ printVersion() {
 printHelp() {
     cat <<EOF >&2
 Usage:
-  $0 [-c NUMBER] [-l CHANGELOG] -n PACKAGE [-t BRANCH] [-u HOST] [-w WORKDIR] [-b|-p] [-h] [-v]
+  $0 [-c NUMBER] [-d DSCURL] [-l CHANGELOG] -n PACKAGE [-t BRANCH] [-u HOST] [-w WORKDIR] [-b|-p] [-h] [-v]
 
 Build script for deepin mipsel package team
 
@@ -65,6 +65,7 @@ Help Options:
   -h, --help            Show help options
 Application Options:
   -c, --cl=NUMBER              Build package based on a CL: NUMBER
+  -d, --dsc=DSCURL             Download debian src package from DSCURL
   -l, --changelog=CHANGELOG    Use CHANGELOG as debian package changelog
   -n, --package=PACKAGE        Build PACKAGE
   -t, --target-branch=BRANCH   Check out to specific BRANCH
@@ -293,6 +294,16 @@ EOF
     sudo pbuilder create ${PBUILDEROPTS[@]} ${PBUILDEREXTRAOPTS[@]}
 }
 
+# taken from http://stackoverflow.com/questions/3183444/check-for-valid-link-url
+checkValidURL() {
+    regex='(https?|ftp|file)://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]'
+    if [[ $1 =~ $regex ]] ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 print_build_info() {
 cat <<EOF
 We're working on
@@ -307,8 +318,8 @@ EOF
 [[ $EUID -eq 0 ]] && die "Don't build package with priviledged user"
 
 OPTS=$(getopt -n $0 \
-        -o 'c:l:n:t:u:w:bhpv' \
-        --long cl:,changelog:,package:,target-branch:,upload:,workdir:,build,help,pbuilder,version \
+        -o 'c:d:l:n:t:u:w:bhpv' \
+        --long cl:,dsc:,changelog:,package:,target-branch:,upload:,workdir:,build,help,pbuilder,version \
         -- "$@")
 
 [[ $? -eq 0 ]] || die "Sorry! I don't understand!!!"
@@ -321,6 +332,10 @@ while : ; do
             CHANGELIST=$2
             [[ $CHANGELIST -eq 0 ]] && die "CL $CHANGELIST is illegal"
             shift 2
+            ;;
+        -d|--dsc)
+            dscurl=$2
+            shift2
             ;;
         -l|--changelog)
             changelog=$2
@@ -408,6 +423,21 @@ fi
     repository=${BASEURI}/${package##deepin-}
 
 patchdir=${WORKBASE}/patches/${package}
+
+downloadDebianSrc() {
+    local dscfile=$(basename ${dscurl})
+
+    has_bin dget || die "Missing devscripts in the system"
+    checkValidURL $dscurl || die "invalid url: $dscurl"
+
+    pushd ${workdir}
+    dget ${dscurl}
+
+    [[ -f $dscfile ]] || die "Not able to load dsc file: $dscfile"
+
+    PKGVER=$(echo ${dscfile//.dsc} | sed -e "s/${package}_//")
+    popd
+}
 
 make_orig_tarball() {
     local work_branch=${targetbranch:=master}
@@ -509,7 +539,11 @@ upload_package() {
     dput -uf ${uhost} ${workdir}/${package}_${PKGVER}_mipsel.changes
 }
 
-make_orig_tarball
+if [[ -n ${uhost} ]] ;then
+    downloadDebianSrc
+else
+    make_orig_tarball
+fi
 prepare_build
 build_package
 upload_package
