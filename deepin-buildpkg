@@ -6,6 +6,7 @@
 # Features:
 #   1. gerrit/git-review support
 #   2. pbuilder support
+#   3. dget and dput wrapper
 
 set -e
 
@@ -57,7 +58,7 @@ printVersion() {
 printHelp() {
     cat <<EOF >&2
 Usage:
-  $0 [-c NUMBER] [-d DSCURL] [-l CHANGELOG] -n PACKAGE [-t BRANCH] [-u HOST] [-w WORKDIR] [-b|-p] [-h] [-v]
+  $0 [-c NUMBER] [-l CHANGELOG] -n PACKAGE|-d DSC [-t BRANCH] [-u HOST] [-w WORKDIR] [-b|-p] [-h] [-v]
 
 Build script for deepin mipsel package team
 
@@ -65,7 +66,8 @@ Help Options:
   -h, --help            Show help options
 Application Options:
   -c, --cl=NUMBER              Build package based on a CL: NUMBER
-  -d, --dsc=DSCURL             Download debian src package from DSCURL
+  -d, --dsc=DSC                Build package according to a DSC, DSC should be
+                               a local path or url to Debian src control file
   -l, --changelog=CHANGELOG    Use CHANGELOG as debian package changelog
   -n, --package=PACKAGE        Build PACKAGE
   -t, --target-branch=BRANCH   Check out to specific BRANCH
@@ -246,6 +248,8 @@ apply_patches() {
     pkgIsDebianized || \
         die "You should debianize your package, workdir: $PWD!!!"
 
+    local patchdir=${WORKBASE}/patches/${package}
+
     if has_patch $patchdir ; then
         debsrcFormatter
 
@@ -315,134 +319,36 @@ We're working on
 EOF
 }
 
-[[ $EUID -eq 0 ]] && die "Don't build package with priviledged user"
-
-OPTS=$(getopt -n $0 \
-        -o 'c:d:l:n:t:u:w:bhpv' \
-        --long cl:,dsc:,changelog:,package:,target-branch:,upload:,workdir:,build,help,pbuilder,version \
-        -- "$@")
-
-[[ $? -eq 0 ]] || die "Sorry! I don't understand!!!"
-
-eval set -- "${OPTS}"
-
-while : ; do
-    case $1 in
-        -c|--cl)
-            CHANGELIST=$2
-            [[ $CHANGELIST -eq 0 ]] && die "CL $CHANGELIST is illegal"
-            shift 2
-            ;;
-        -d|--dsc)
-            dscurl=$2
-            shift2
-            ;;
-        -l|--changelog)
-            changelog=$2
-            shift 2
-            ;;
-        -n|--package)
-            package=$2
-            shift 2
-            ;;
-        -t|--target-branch)
-            targetbranch=$2
-            shift 2
-            ;;
-        -u|--upload)
-            uhost=$2
-            shift 2
-            ;;
-        -w|--workdir)
-            workdir=${WORKBASE}/${2}
-            shift 2
-            ;;
-        -b|--build)
-            do_build=0
-            shift
-            ;;
-        -p|--pbuilder)
-            usepbuilder=0
-            shift
-            ;;
-        -h|--help)
-            printHelp
-            shift
-            ;;
-        -v|--version)
-            printVersion
-            shift
-            ;;
-        --)
-            shift
-            break
-            ;;
-        *)
-            printHelp
-            shift
-            ;;
-    esac
-done
-
-assert package
-
-scriptdir=$(dirname $(readlink -ef $0))
-
-declare -ar PBUILDEROPTS=(
-    "--distribution unstable"
-    "--basetgz      ${WORKBASE}/deepin-base.tgz"
-    "--buildplace   ${WORKBASE}/deepin-chroot"
-    "--hookdir      ${scriptdir}/pbuilder-hook.d"
-    "--configfile   ${scriptdir}/pbuilderrc"
-)
-
-# buildresult must be specifed as pdebuild option
-declare -r PBUILDEREXTRAOPTS=(
-    "--buildresult  ${WORKBASE}/${package}"
-)
-
-# sane default values
-[[ -z $workdir ]]      && workdir=${WORKBASE}/${package}
-[[ -z $changelog ]]    && changelog="Rebuild on mipsel"
-
-createdir $workdir
-createdir $REPOBASE
-
-# set git repository
-if [[ $(contains $package ${dde_components[@]}) -eq 0 ]]; then
-    repository=${BASEURI}/dde/${package}
-else
-    if [[ ${package} = lastore-daemon* ]]; then
-        repository=${BASEURI}/lastore/${package}
-    else
-        repository=${BASEURI}/${package}
-    fi
-fi
-
-[[ ${package} == deepin-default-settings ]] && \
-    repository=${BASEURI}/${package##deepin-}
-
-patchdir=${WORKBASE}/patches/${package}
-
 downloadDebianSrc() {
-    local dscfile=$(basename ${dscurl})
+    local dscfile=
+    dscfile=$(basename ${dscurl})
 
-    has_bin dget || die "Missing devscripts in the system"
-    checkValidURL $dscurl || die "invalid url: $dscurl"
-
-    pushd ${workdir}
-    dget ${dscurl}
-
-    [[ -f $dscfile ]] || die "Not able to load dsc file: $dscfile"
-
+    package=${dscfile%%_*}
     PKGVER=$(echo ${dscfile//.dsc} | sed -e "s/${package}_//")
-    popd
+
+    workdir=${WORKBASE}/${package}
+
+    createdir ${workdir}
+
+    if checkValidURL $dscurl ; then
+        has_bin dget || die "Missing devscripts in the system"
+
+        pushd ${workdir}
+
+        dget -u ${dscurl}
+
+        popd
+    fi
+    [[ -f ${workdir}/$(basename $dscurl) ]] || \
+        die "Invalid dsc file: $dscfile"
 }
 
 make_orig_tarball() {
     local work_branch=${targetbranch:=master}
     local repodir=${REPOBASE}/${package}
     local has_raccoon=$(contains ${package} ${raccoon_components[@]})
+
+    createdir ${workdir}
 
     if [[ $has_raccoon -eq 0 ]] ; then
         work_branch=raccoon
@@ -514,16 +420,18 @@ build_package() {
     fixBuildDeps
     fixDebuildOptions
 
-    if [[ $do_build -eq 0 ]] ; then
+    if [[ $do_build -eq 1 ]] ; then
         export DEBEMAIL="mips@deepin.com"
         export DEBFULLNAME="Deepin/MIPS Team"
         dch -v ${PKGVER} -D unstable "${changelog}"
-        if [[ $usepbuilder -eq 0 ]] ; then
+
+        if [[ $usepbuilder -eq 1 ]] ; then
             export ${BOPTS//-e}
             hasPbuilderChroot || initializePbuilder
-            eval pdebuild --use-pdebuild-internal  \
+            eval pdebuild                       \
+                --use-pdebuild-internal         \
                 --debbuildopts '"${DBPKGOPTS}"' \
-                ${PBUILDEREXTRAOPTS[@]}            \
+                ${PBUILDEREXTRAOPTS[@]}         \
                 -- ${PBUILDEROPTS[@]}
         else
             echo "Debuild options: ${BOPTS} ${DBPKGOPTS}"
@@ -539,12 +447,122 @@ upload_package() {
     dput -uf ${uhost} ${workdir}/${package}_${PKGVER}_mipsel.changes
 }
 
-if [[ -n ${uhost} ]] ;then
+[[ $EUID -eq 0 ]] && die "Don't build package with priviledged user"
+
+OPTS=$(getopt -n $0 \
+        -o 'c:d:l:n:t:u:w:bhpv' \
+        --long cl:,dsc:,changelog:,package:,target-branch:,upload:,workdir:,build,help,pbuilder,version \
+        -- "$@")
+
+[[ $? -eq 0 ]] || die "Sorry! I don't understand!!!"
+
+eval set -- "${OPTS}"
+
+while : ; do
+    case $1 in
+        -c|--cl)
+            CHANGELIST=$2
+            [[ $CHANGELIST -eq 0 ]] && die "CL $CHANGELIST is illegal"
+            shift 2
+            ;;
+        -d|--dsc)
+            dscurl=$2
+            shift 2
+            ;;
+        -l|--changelog)
+            changelog=$2
+            shift 2
+            ;;
+        -n|--package)
+            package=$2
+            shift 2
+            ;;
+        -t|--target-branch)
+            targetbranch=$2
+            shift 2
+            ;;
+        -u|--upload)
+            uhost=$2
+            shift 2
+            ;;
+        -w|--workdir)
+            workdir=${WORKBASE}/${2}
+            shift 2
+            ;;
+        -b|--build)
+            do_build=1
+            shift
+            ;;
+        -p|--pbuilder)
+            do_build=1
+            usepbuilder=1
+            shift
+            ;;
+        -h|--help)
+            printHelp
+            shift
+            ;;
+        -v|--version)
+            printVersion
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            printHelp
+            shift
+            ;;
+    esac
+done
+
+scriptdir=$(dirname $(readlink -ef $0))
+
+declare -ar PBUILDEROPTS=(
+    "--distribution unstable"
+    "--basetgz      ${WORKBASE}/deepin-base.tgz"
+    "--buildplace   ${WORKBASE}/deepin-chroot"
+    "--hookdir      ${scriptdir}/pbuilder-hook.d"
+    "--configfile   ${scriptdir}/pbuilderrc"
+)
+
+# buildresult must be specifed as pdebuild option
+declare -r PBUILDEREXTRAOPTS=(
+    "--buildresult  ${WORKBASE}/${package}"
+)
+
+if [[ -z $dscurl ]] ; then
+    assert package
+    [[ -z $workdir ]] && workdir=${WORKBASE}/${package}
+fi
+
+[[ -z $changelog ]] && changelog="Rebuild on mipsel"
+
+if [[ -n ${package} ]] ; then
+    createdir $REPOBASE
+
+    # set git repository
+    if [[ $(contains $package ${dde_components[@]}) -eq 0 ]]; then
+        repository=${BASEURI}/dde/${package}
+    else
+        if [[ ${package} = lastore-daemon* ]]; then
+            repository=${BASEURI}/lastore/${package}
+        else
+            repository=${BASEURI}/${package}
+        fi
+    fi
+
+    [[ ${package} == deepin-default-settings ]] && \
+        repository=${BASEURI}/${package##deepin-}
+fi
+
+if [[ -n ${dscurl} ]] ;then
     downloadDebianSrc
 else
     make_orig_tarball
+    prepare_build
 fi
-prepare_build
 build_package
 upload_package
 
