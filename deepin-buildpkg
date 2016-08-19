@@ -319,9 +319,13 @@ We're working on
 EOF
 }
 
+urlDecode() {
+	echo -e "$(echo $1 | sed 's/+/ /g; s/%/\\x/g')"
+}
+
 downloadDebianSrc() {
     local dscfile=
-    dscfile=$(basename ${dscurl})
+    dscfile=$(basename $(urlDecode ${dscurl}))
 
     package=${dscfile%%_*}
     PKGVER=$(echo ${dscfile//.dsc} | sed -e "s/${package}_//")
