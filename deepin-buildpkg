@@ -320,7 +320,11 @@ EOF
 }
 
 urlDecode() {
-	echo -e "$(echo $1 | sed 's/+/ /g; s/%/\\x/g')"
+    if grep -qs % $1 ; then
+        echo -e "$(echo $1 | sed 's/+/ /g; s/%/\\x/g')"
+    else
+        echo $1
+    fi
 }
 
 downloadDebianSrc() {
