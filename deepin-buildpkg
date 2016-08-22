@@ -146,7 +146,7 @@ contains() {
         break
     fi
     done
-    echo $result
+    return $result
 }
 
 createdir() {
@@ -354,11 +354,10 @@ downloadDebianSrc() {
 make_orig_tarball() {
     local work_branch=${targetbranch:=master}
     local repodir=${REPOBASE}/${package}
-    local has_raccoon=$(contains ${package} ${raccoon_components[@]})
 
     createdir ${workdir}
 
-    if [[ $has_raccoon -eq 0 ]] ; then
+    if contains ${package} ${raccoon_components[@]} ; then
         work_branch=raccoon
         if [[ $work_branch != $targetbranch ]] ; then
             echo -e "\n\t\tworking branch is not the target branch\n"
@@ -551,7 +550,7 @@ if [[ -n ${package} ]] ; then
     createdir $REPOBASE
 
     # set git repository
-    if [[ $(contains $package ${dde_components[@]}) -eq 0 ]]; then
+    if contains $package ${dde_components[@]}; then
         repository=${BASEURI}/dde/${package}
     else
         if [[ ${package} = lastore-daemon* ]]; then
