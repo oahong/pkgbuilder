@@ -340,15 +340,14 @@ downloadDebianSrc() {
 
     if checkValidURL $dscurl ; then
         has_bin dget || die "Missing devscripts in the system"
-
         pushd ${workdir}
-
-        dget -u ${dscurl}
-
+        dget -d -u ${dscurl}
         popd
     fi
+
     [[ -f ${workdir}/$(basename $dscurl) ]] || \
         die "Invalid dsc file: $dscfile"
+    dscurl=$dscfile
 }
 
 make_orig_tarball() {
@@ -406,16 +405,27 @@ make_orig_tarball() {
 }
 
 prepare_build() {
-    rm -rf ${workdir}/${package}-${PKGVER}
-    pushd ${workdir}
-    tar xf ${package}_${PKGVER}.orig.tar.xz
-    popd
+    local srcdir=${workdir}/${package}-${PKGVER}
+    local srcpkg=${workdir}/${package}_${PKGVER}.orig.tar.xz
 
-    pushd ${workdir}/${package}-${PKGVER}
-    if ! pkgIsDebianized ; then
-        cp -a ${WORKBASE}/pkg_debian/${package}/debian .
+    rm -rf $srcdir
+
+    if [[ -n $dscurl ]] ; then
+        dpkg-source -x ${workdir}/${dscurl} ${srcdir}
+    else
+        if [[ ! -f $srcpkg ]] ; then
+            srcpkg=${srcpkg/.orig/}
+            [[ -f $srcpkg ]] || die "src package $srcpkg not found"
+        fi
+
+        tar xf ${srcpkg} -C ${workdir}
+
+        pushd ${srcdir}
+        if ! pkgIsDebianized ; then
+            cp -a ${WORKBASE}/pkg_debian/${package}/debian .
+        fi
+        popd
     fi
-    popd
 }
 
 build_package() {
@@ -568,8 +578,8 @@ if [[ -n ${dscurl} ]] ;then
     downloadDebianSrc
 else
     make_orig_tarball
-    prepare_build
 fi
+prepare_build
 build_package
 upload_package
 
