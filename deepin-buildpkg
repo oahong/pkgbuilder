@@ -14,7 +14,7 @@ set -e
 declare -r WORKBASE=/mnt/packages
 declare -r BASEURI=http://cr.deepin.io
 declare -r REPOBASE=${WORKBASE}/git-repos
-declare -r SVERSION="v0.0.1"
+declare -r SVERSION="v0.1.0"
 declare -r DBPKGOPTS="-us -uc -sa -j8"
 declare -i CHANGELIST=
 
