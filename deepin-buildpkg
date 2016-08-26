@@ -441,7 +441,12 @@ build_package() {
     if [[ $do_build -eq 1 ]] ; then
         export DEBEMAIL="mips@deepin.com"
         export DEBFULLNAME="Deepin/MIPS Team"
-        dch -v ${PKGVER} -D unstable "${changelog}"
+
+        if [[ -n $dscurl ]] ; then
+            dch -i -D unstable "${changelog}"
+        else
+            dch -v ${PKGVER} -D unstable "${changelog}"
+        fi
 
         if [[ $usepbuilder -eq 1 ]] ; then
             export ${BOPTS//-e}
