@@ -2,8 +2,9 @@
 # TODO:
 #   1. rewrite
 #   2. cowbuilder support
-#   3. git-buildpackage
-#   4. use dpkg-buildpackage hooks
+#   3. eatmydata
+#   4. git-buildpackage
+#   5. use dpkg-buildpackage hooks
 # Features:
 #   1. gerrit/git-review support
 #   2. pbuilder support
