@@ -263,7 +263,7 @@ apply_patches() {
 }
 
 hasPbuilderChroot() {
-    if [[ -f ${WORKBASE}/deepin-base.tgz ]] ; then
+    if [[ -x ${WORKBASE}/base.cow/bin/ls ]] ; then
         return 0
     else
         return 1
@@ -272,6 +272,7 @@ hasPbuilderChroot() {
 
 initializePbuilder() {
     has_bin pbuilder || die "Install pbuilder!!!"
+    has_bin cowbuilder || die "Install cowbuilder!!!"
 
     # Should I use options instead of configuration?
     echo "Initialize pbuilder configuration"
@@ -290,14 +291,10 @@ EOF
 
     createdir ${WORKBASE}/deepin-chroot
 
-    if grep -wqs deepin-chroot /proc/mounts ; then
-        cat <<EOF>&2
-To speed up build operation, mounting tmpfs to ${WORKBASE}/deepin-chroot
-is recommended
-EOF
-    fi
-
-    sudo pbuilder create ${PBUILDEROPTS[@]} ${PBUILDEREXTRAOPTS[@]}
+    sudo cowbuilder --create	 \
+         ${PBUILDEROPTS[@]}	 \
+         ${PBUILDEREXTRAOPTS[@]} \
+         ${COWBUILDEROPTS[@]}
 }
 
 # taken from http://stackoverflow.com/questions/3183444/check-for-valid-link-url
@@ -452,11 +449,13 @@ build_package() {
         if [[ $usepbuilder -eq 1 ]] ; then
             export ${BOPTS//-e}
             hasPbuilderChroot || initializePbuilder
-            eval pdebuild                       \
+            eval pdebuild --pbuilder cowbuilder \
                 --use-pdebuild-internal         \
                 --debbuildopts '"${DBPKGOPTS}"' \
                 ${PBUILDEREXTRAOPTS[@]}         \
-                -- ${PBUILDEROPTS[@]}
+                --				\
+		${PBUILDEROPTS[@]}		\
+		${COWBUILDEROPTS[@]}
         else
             echo "Debuild options: ${BOPTS} ${DBPKGOPTS}"
             eval debuild ${BOPTS} ${DBPKGOPTS}
@@ -543,9 +542,10 @@ done
 
 scriptdir=$(dirname $(readlink -ef $0))
 
+# cowbuilder has not basetgz
+#    "--basetgz      ${WORKBASE}/deepin-base.tgz"
 declare -ar PBUILDEROPTS=(
     "--distribution unstable"
-    "--basetgz      ${WORKBASE}/deepin-base.tgz"
     "--buildplace   ${WORKBASE}/deepin-chroot"
     "--hookdir      ${scriptdir}/pbuilder-hook.d"
     "--configfile   ${scriptdir}/pbuilderrc"
@@ -554,6 +554,11 @@ declare -ar PBUILDEROPTS=(
 # buildresult must be specifed as pdebuild option
 declare -r PBUILDEREXTRAOPTS=(
     "--buildresult  ${WORKBASE}/${package}"
+)
+
+declare -ar COWBUILDEROPTS=(
+    "--basepath     ${WORKBASE}/base.cow"
+    "--buildplace   ${WORKBASE}/deepin-chroot"
 )
 
 if [[ -z $dscurl ]] ; then
