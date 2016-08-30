@@ -107,6 +107,15 @@ has_bin() {
     fi
 }
 
+has_package() {
+    local pkg=$1
+    if dpkg-query -f '${binary:Package}\n' -W | grep -wqs $pkg ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 configGitReview() {
     echo "create per project gitreview configuration"
     if [[ ! -f .gitreview ]] ; then
@@ -209,7 +218,7 @@ debsrcFormatter() {
     fi
 
     if [[ $sformat =~ 3.0[[:space:]]\((native|quilt)\) ]] ; then
-    echo "${package} has debsrc 3.0 format: $sformat"
+        echo "${package} has debsrc 3.0 format: $sformat"
     fi
 
     if has_patch; then
@@ -285,8 +294,10 @@ MIRRORSITE="http://192.168.1.135/debian-mipsel"
 OTHERMIRROR="deb http://pools.corp.deepin.com/mipsel-experimental unstable main|deb http://192.168.1.135/mipsel-staging raccoon main"
 ALLOWUNTRUSTED=yes
 DEBOOTSTRAPOPTS=( '--variant=buildd' '--no-check-gpg' )
-EXTRAPACKAGES="lintian gccgo-5"
-APTCACHEHARDLINK=no
+EXTRAPACKAGES="lintian gccgo-5 eatmydata"
+# pbuilder >= 0.225
+# EATMYDATA=yes
+export LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}libeatmydata.so"
 EOF
 
     createdir ${WORKBASE}/deepin-chroot
@@ -448,14 +459,17 @@ build_package() {
 
         if [[ $usepbuilder -eq 1 ]] ; then
             export ${BOPTS//-e}
+            has_package eatmydata  ||   \
+                die "Please install eatmydata on the build host!!!"
+
             hasPbuilderChroot || initializePbuilder
             eval pdebuild --pbuilder cowbuilder \
                 --use-pdebuild-internal         \
                 --debbuildopts '"${DBPKGOPTS}"' \
                 ${PBUILDEREXTRAOPTS[@]}         \
-                --				\
-		${PBUILDEROPTS[@]}		\
-		${COWBUILDEROPTS[@]}
+                --                              \
+                ${PBUILDEROPTS[@]}              \
+                ${COWBUILDEROPTS[@]}
         else
             echo "Debuild options: ${BOPTS} ${DBPKGOPTS}"
             eval debuild ${BOPTS} ${DBPKGOPTS}
