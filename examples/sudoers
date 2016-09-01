@@ -1,0 +1,4 @@
+# Replace user name and put the sudoers into /etc/sudoers.d
+Cmnd_Alias PBUILDERS = /usr/sbin/pbuilder, /usr/sbin/cowbuilder
+Defaults! PBUILDERS setenv
+deepin  ALL=(ALL) NOPASSWD: PBUILDERS
