@@ -482,7 +482,7 @@ build_package() {
 upload_package() {
     [[ -z $uhost ]] && return 0
     has_bin dput || die "Missing dput in the system!!!"
-    dput -uf ${uhost} ${workdir}/${package}_${PKGVER}_mipsel.changes
+    dput -uf ${uhost} $(ls -At ${workdir}/*.changes| head -n 1)
 }
 
 [[ $EUID -eq 0 ]] && die "Don't build package with priviledged user"
