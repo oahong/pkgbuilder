@@ -187,6 +187,8 @@ pkgIsDebianized() {
 dquilt() {
     local quiltrc=${HOME}/.quiltrc-dpkg
 
+    has_bin quilt || die "Install quilt!!!"
+
     if [[ ! -f $quiltrc ]] ; then
         echo "Write quilt configuration: $quiltrc"
 
@@ -258,7 +260,7 @@ apply_patches() {
     pkgIsDebianized || \
         die "You should debianize your package, workdir: $PWD!!!"
 
-    local patchdir=${WORKBASE}/patches/${package}
+    local patchdir=${scriptdir}/patches/${package}
 
     if has_patch $patchdir ; then
         debsrcFormatter
