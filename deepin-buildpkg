@@ -329,16 +329,16 @@ EOF
 }
 
 urlDecode() {
-    if grep -qs % $1 ; then
-        echo -e "$(echo $1 | sed 's/+/ /g; s/%/\\x/g')"
+    if echo $1 | grep -qs % ; then
+        echo -e "$(echo $1 | sed 's/+/ /g;s/%/\\x/g')"
     else
         echo $1
     fi
 }
 
 downloadDebianSrc() {
-    local dscfile=
-    dscfile=$(basename $(urlDecode ${dscurl}))
+    local odscfile=$(basename ${dscurl})
+    local dscfile=$(urlDecode $odscfile)
 
     package=${dscfile%%_*}
     PKGVER=$(echo ${dscfile//.dsc} | sed -e "s/${package}_//")
@@ -351,10 +351,12 @@ downloadDebianSrc() {
         has_bin dget || die "Missing devscripts in the system"
         pushd ${workdir}
         dget -d -u ${dscurl}
+        # rename dscfile
+        mv $odscfile $dscfile
         popd
     fi
 
-    [[ -f ${workdir}/$(basename $dscurl) ]] || \
+    [[ -f ${workdir}/${dscfile} ]] || \
         die "Invalid dsc file: $dscfile"
     dscurl=$dscfile
 }
