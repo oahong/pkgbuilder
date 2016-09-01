@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+
+BUILDDIR="${HOME}"
+
+install_packages() {
+    apt-get -y "${APTGETOPT[@]}" install "$@"
+}
+
+install_packages lintian
+
+echo "+++ lintian output +++"
+
+# use this version if you don't want lintian to fail the build
+su -c "lintian -I --show-overrides "$BUILDDIR"/*.changes; :" - pbuser
+
+echo "+++ end of lintian output +++"
