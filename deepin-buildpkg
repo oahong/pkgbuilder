@@ -12,9 +12,7 @@
 
 set -e
 
-declare -r WORKBASE=/mnt/packages
 declare -r BASEURI=http://cr.deepin.io
-declare -r REPOBASE=${WORKBASE}/git-repos
 declare -r SVERSION="v0.1.5"
 declare -r DBPKGOPTS="-us -uc -sa -j8"
 declare -i CHANGELIST=
@@ -393,10 +391,10 @@ downloadDebianSrc() {
 }
 
 createSrcArchives() {
+    createWorkdir
+
     local work_branch=${targetbranch:=master}
     local repodir=${REPOBASE}/${package}
-
-    createWorkdir
 
     if contains ${package} ${raccoon_components[@]} ; then
         work_branch=raccoon
@@ -516,6 +514,9 @@ uploadArtifacts() {
     dput -uf ${uhost} $(ls -At ${workdir}/*.changes| head -n 1)
 }
 
+##########
+# Operation start from here
+##############################
 [[ $EUID -eq 0 ]] && die "Don't build package with priviledged user"
 
 OPTS=$(getopt -n $0 \
@@ -588,7 +589,9 @@ done
 
 contains $ARCH ${ARCHITECTURES[@]} || die "$ARCH is an unsupported architecture"
 
-scriptdir=$(dirname $(readlink -ef $0))
+declare -r scriptdir=$(dirname $(readlink -ef $0))
+declare -r WORKBASE=${scriptdir%/*}
+declare -r REPOBASE=${WORKBASE}/git-repos
 
 # cowbuilder has not basetgz
 #    "--basetgz      ${WORKBASE}/deepin-base.tgz"
@@ -609,7 +612,6 @@ declare -ar COWBUILDEROPTS=(
     "--buildplace   ${WORKBASE}/deepin-chroot"
 )
 
-[[ -z $dscurl ]]    && assert package
 [[ -z $changelog ]] && changelog="Rebuild on ${DISTRIBUTIONS[${ARCH}]}"
 
 if [[ -n ${package} ]] ; then
