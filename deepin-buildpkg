@@ -3,19 +3,19 @@
 #   1. rewrite
 #   2. git-buildpackage
 #   3. use dpkg-buildpackage hooks
-#   4. support mipsel and mips64el archs
 # Features:
 #   1. gerrit/git-review support
 #   2. pbuilder support
 #   3. dget and dput wrapper
 #   4. cowbuilder (eatmydata) support
+#   5. support mipsel and mips64el archs
 
 set -e
 
 declare -r WORKBASE=/mnt/packages
 declare -r BASEURI=http://cr.deepin.io
 declare -r REPOBASE=${WORKBASE}/git-repos
-declare -r SVERSION="v0.1.0"
+declare -r SVERSION="v0.1.5"
 declare -r DBPKGOPTS="-us -uc -sa -j8"
 declare -i CHANGELIST=
 
