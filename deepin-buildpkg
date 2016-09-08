@@ -353,6 +353,7 @@ We're working on
     changelog:      $changelog
     CL:             $CHANGELIST
     repository:     $repository
+    dsc:            $dscurl
 EOF
 }
 
@@ -634,6 +635,8 @@ if [[ -n ${package} ]] ; then
     [[ ${package} == deepin-default-settings ]] && \
         repository=${BASEURI}/${package##deepin-}
 fi
+
+printBuildInfo
 
 if [[ -n ${dscurl} ]] ;then
     downloadDebianSrc
