@@ -370,7 +370,7 @@ downloadDebianSrc() {
         pushd ${workdir}
         dget -d -u ${dscurl}
         # rename dscfile
-        mv $odscfile $dscfile
+        [[ $odscfile == $dscfile ]] || mv $odscfile $dscfile
         popd
     fi
 
