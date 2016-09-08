@@ -85,7 +85,6 @@ Application Options:
   -t, --target-branch=BRANCH   Check out to specific BRANCH
   -u, --upload=HOST            Upload build artifacts to HOST, you should
                                define HOST in dput config
-  -w, --workdir=DIR            Override the default WORKDIR
   -b, --build                  Perform a package build using debuild
   -p, --pbuilder               Perform a package build using pbuilder
                                (recommended for a clean buid)
@@ -270,7 +269,7 @@ fixDebuildOptions() {
 
 applyPatches() {
     pkgIsDebianized || \
-        die "You should debianize your package, workdir: $PWD!!!"
+        die "You should debianize your package, cwd: $PWD!!!"
 
     local patchdir=${scriptdir}/patches/${package}
 
@@ -349,7 +348,6 @@ printBuildInfo() {
 cat <<EOF
 We're working on
     package:        $package
-    workdir:        $workdir
     changelog:      $changelog
     CL:             $CHANGELIST
     repository:     $repository
@@ -365,6 +363,12 @@ urlDecode() {
     fi
 }
 
+createWorkdir() {
+    assert package
+    workdir=${WORKBASE}/${package}
+    createdir ${workdir}
+}
+
 downloadDebianSrc() {
     local odscfile=$(basename ${dscurl})
     local dscfile=$(urlDecode $odscfile)
@@ -372,9 +376,7 @@ downloadDebianSrc() {
     package=${dscfile%%_*}
     PKGVER=$(echo ${dscfile//.dsc} | sed -e "s/${package}_//")
 
-    workdir=${WORKBASE}/${package}
-
-    createdir ${workdir}
+    createWorkdir
 
     if checkValidURL $dscurl ; then
         hasBin dget || die "Missing devscripts in the system"
@@ -394,7 +396,7 @@ createSrcArchives() {
     local work_branch=${targetbranch:=master}
     local repodir=${REPOBASE}/${package}
 
-    createdir ${workdir}
+    createWorkdir
 
     if contains ${package} ${raccoon_components[@]} ; then
         work_branch=raccoon
@@ -517,8 +519,8 @@ uploadArtifacts() {
 [[ $EUID -eq 0 ]] && die "Don't build package with priviledged user"
 
 OPTS=$(getopt -n $0 \
-        -o 'a:c:d:l:n:t:u:w:bhpv' \
-        --long arch:,cl:,dsc:,changelog:,package:,target-branch:,upload:,workdir:,build,help,pbuilder,version \
+        -o 'a:c:d:l:n:t:u:bhpv' \
+        --long arch:,cl:,dsc:,changelog:,package:,target-branch:,upload:,build,help,pbuilder,version \
         -- "$@")
 
 [[ $? -eq 0 ]] || die "Sorry! I don't understand!!!"
@@ -554,10 +556,6 @@ while : ; do
             ;;
         -u|--upload)
             uhost=$2
-            shift 2
-            ;;
-        -w|--workdir)
-            workdir=${WORKBASE}/${2}
             shift 2
             ;;
         -b|--build)
@@ -611,11 +609,7 @@ declare -ar COWBUILDEROPTS=(
     "--buildplace   ${WORKBASE}/deepin-chroot"
 )
 
-if [[ -z $dscurl ]] ; then
-    assert package
-    [[ -z $workdir ]] && workdir=${WORKBASE}/${package}
-fi
-
+[[ -z $dscurl ]]    && assert package
 [[ -z $changelog ]] && changelog="Rebuild on ${DISTRIBUTIONS[${ARCH}]}"
 
 if [[ -n ${package} ]] ; then
@@ -636,13 +630,12 @@ if [[ -n ${package} ]] ; then
         repository=${BASEURI}/${package##deepin-}
 fi
 
-printBuildInfo
-
 if [[ -n ${dscurl} ]] ;then
     downloadDebianSrc
 else
     createSrcArchives
 fi
+printBuildInfo
 prepareBuild
 buildPackage
 uploadArtifacts
