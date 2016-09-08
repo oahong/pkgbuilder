@@ -3,6 +3,7 @@
 #   1. rewrite
 #   2. git-buildpackage
 #   3. use dpkg-buildpackage hooks
+#   4. support mipsel and mips64el archs
 # Features:
 #   1. gerrit/git-review support
 #   2. pbuilder support
