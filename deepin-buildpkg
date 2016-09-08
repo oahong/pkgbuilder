@@ -109,7 +109,7 @@ die() {
     exit 1
 }
 
-has_bin() {
+hasBin() {
     local executable=$1
     if [[ -n $(type $1) ]] ; then
         return 0
@@ -118,7 +118,7 @@ has_bin() {
     fi
 }
 
-has_package() {
+hasPackage() {
     local pkg=$1
     if dpkg-query -f '${binary:Package}\n' -W | grep -wqs $pkg ; then
         return 0
@@ -138,7 +138,7 @@ EOF
 }
 
 downloadGerritChange() {
-    if has_bin git-review ; then
+    if hasBin git-review ; then
         git review -d $1
     else
         die "Missing git-review in the system!!!"
@@ -180,7 +180,7 @@ createdir() {
     fi
 }
 
-has_patch() {
+hasPatch() {
     if [[ -d $patchdir ]] ; then
         return 0
     else
@@ -199,7 +199,7 @@ pkgIsDebianized() {
 dquilt() {
     local quiltrc=${HOME}/.quiltrc-dpkg
 
-    has_bin quilt || die "Install quilt!!!"
+    hasBin quilt || die "Install quilt!!!"
 
     if [[ ! -f $quiltrc ]] ; then
         echo "Write quilt configuration: $quiltrc"
@@ -234,7 +234,7 @@ debsrcFormatter() {
         echo "${package} has debsrc 3.0 format: $sformat"
     fi
 
-    if has_patch; then
+    if hasPatch; then
         echo "Found patches, set package source format to debsrc 3.0 quilt"
         sformat=$quilt
         createdir ${sformatfile//format}; echo $sformat > ${sformatfile}
@@ -268,13 +268,13 @@ fixDebuildOptions() {
     return 0
 }
 
-apply_patches() {
+applyPatches() {
     pkgIsDebianized || \
         die "You should debianize your package, workdir: $PWD!!!"
 
     local patchdir=${scriptdir}/patches/${package}
 
-    if has_patch $patchdir ; then
+    if hasPatch $patchdir ; then
         debsrcFormatter
 
         for patch in $patchdir/*.patch; do
@@ -293,8 +293,8 @@ hasPbuilderChroot() {
 }
 
 initializePbuilder() {
-    has_bin pbuilder || die "Install pbuilder!!!"
-    has_bin cowbuilder || die "Install cowbuilder!!!"
+    hasBin pbuilder || die "Install pbuilder!!!"
+    hasBin cowbuilder || die "Install cowbuilder!!!"
 
     # Should I use options instead of configuration?
     echo "Initialize pbuilder configuration"
@@ -345,7 +345,7 @@ checkValidURL() {
     fi
 }
 
-print_build_info() {
+printBuildInfo() {
 cat <<EOF
 We're working on
     package:        $package
@@ -376,7 +376,7 @@ downloadDebianSrc() {
     createdir ${workdir}
 
     if checkValidURL $dscurl ; then
-        has_bin dget || die "Missing devscripts in the system"
+        hasBin dget || die "Missing devscripts in the system"
         pushd ${workdir}
         dget -d -u ${dscurl}
         # rename dscfile
@@ -389,7 +389,7 @@ downloadDebianSrc() {
     dscurl=$dscfile
 }
 
-make_orig_tarball() {
+createSrcArchives() {
     local work_branch=${targetbranch:=master}
     local repodir=${REPOBASE}/${package}
 
@@ -404,7 +404,7 @@ make_orig_tarball() {
 
     echo "Current branch is $work_branch"
 
-    has_bin git || die "Missing git in the system!!!"
+    hasBin git || die "Missing git in the system!!!"
 
     # fetch git repository
     [[ -d ${repodir}/.git ]] || git clone -b ${work_branch} ${repository} ${repodir}
@@ -443,7 +443,7 @@ make_orig_tarball() {
     popd
 }
 
-prepare_build() {
+prepareBuild() {
     local srcdir=${workdir}/${package}-${PKGVER}
     local srcpkg=${workdir}/${package}_${PKGVER}.orig.tar.xz
 
@@ -467,11 +467,11 @@ prepare_build() {
     fi
 }
 
-build_package() {
+buildPackage() {
     pushd ${workdir}/${package}-${PKGVER}
 
     # Apply patches unless build official package (Not from any CL)
-    [[ $CHANGELIST -eq 0 ]] && apply_patches
+    [[ $CHANGELIST -eq 0 ]] && applyPatches
 
     fixBuildDeps
     fixDebuildOptions
@@ -488,7 +488,7 @@ build_package() {
 
         if [[ $usepbuilder -eq 1 ]] ; then
             export ${BOPTS//-e}
-            has_package eatmydata  ||   \
+            hasPackage eatmydata  ||   \
                 die "Please install eatmydata on the build host!!!"
 
             hasPbuilderChroot || initializePbuilder
@@ -507,9 +507,9 @@ build_package() {
     popd
 }
 
-upload_package() {
+uploadArtifacts() {
     [[ -z $uhost ]] && return 0
-    has_bin dput || die "Missing dput in the system!!!"
+    hasBin dput || die "Missing dput in the system!!!"
     dput -uf ${uhost} $(ls -At ${workdir}/*.changes| head -n 1)
 }
 
@@ -638,10 +638,10 @@ fi
 if [[ -n ${dscurl} ]] ;then
     downloadDebianSrc
 else
-    make_orig_tarball
+    createSrcArchives
 fi
-prepare_build
-build_package
-upload_package
+prepareBuild
+buildPackage
+uploadArtifacts
 
 # vim: number tabstop=4 softtabstop=4 expandtab
