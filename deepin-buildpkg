@@ -18,15 +18,19 @@ declare -r REPOBASE=${WORKBASE}/git-repos
 declare -r SVERSION="v0.1.0"
 declare -r DBPKGOPTS="-us -uc -sa -j8"
 declare -i CHANGELIST=
-declare -ra ARCHITECTURES=(
-    mipsel
-    mips64el
-)
 
 declare BOPTS=
 declare PKGVER=
 declare ARCH=$(dpkg-architecture -qDEB_HOST_ARCH)
 
+declare -ra ARCHITECTURES=(
+    mipsel
+    mips64el
+)
+declare -rA DISTRIBUTIONS=(
+    ['mipsel']='unstable'
+    ['mips64el']='testing'
+)
 declare -ra dde_components=(
     dde-account-faces
     dde-api
@@ -67,7 +71,7 @@ printHelp() {
 Usage:
   $0 [-a ARCH] [-c NUMBER] [-l CHANGELOG] -n PACKAGE|-d DSC [-t BRANCH] [-u HOST] [-w WORKDIR] [-b|-p] [-h] [-v]
 
-Build script for deepin mipsel package team
+Build script for deepin mips team
 
 Help Options:
   -h, --help            Show help options
@@ -88,7 +92,7 @@ Application Options:
   -v, --version                Show version
 
 Note:
-$0 will not issue any build command (pbuilder or debuild) unless -p or -b option is specified.
+$0 will not issue any build command (pdebuild or debuild) unless -p or -b option is specified.
 
 Examples:
   $0 -n dde-desktop                            Prepare for building dde-destop
@@ -274,7 +278,7 @@ apply_patches() {
         debsrcFormatter
 
         for patch in $patchdir/*.patch; do
-            echo "Import mipsel specific patch: $(basename $patch)"
+            echo "Import mips specific patch: $(basename $patch)"
             dquilt import $patch
         done
     fi
@@ -298,9 +302,8 @@ initializePbuilder() {
     # Always overwrite the configuration
     cat <<EOF > ${scriptdir}/pbuilderrc
 AUTO_DEBSIGN=no
+ARCHITECTURE="${DISTRIBUTIONS[${ARCH}]}"
 BINDMOUNT="$WORKBASE"
-MIRRORSITE="http://192.168.1.135/debian-mipsel"
-OTHERMIRROR="deb http://pools.corp.deepin.com/mipsel-experimental unstable main|deb http://192.168.1.135/mipsel-staging raccoon main"
 ALLOWUNTRUSTED=yes
 DEBOOTSTRAPOPTS=( '--variant=buildd' '--no-check-gpg' )
 EXTRAPACKAGES="lintian gccgo-5 eatmydata"
@@ -309,13 +312,20 @@ EXTRAPACKAGES="lintian gccgo-5 eatmydata"
 export LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}libeatmydata.so"
 EOF
 
-    if [[ $ARCH == mips64el ]] ; then
-    cat <<EOF >> ${scriptdir}/pbuilderrc
-MIRRORSITE="http://192.168.1.135/mips64el"
-OTHERMIRROR=""
-ARCHITECTURE="mipse64el"
+    case $ARCH in
+        mipsel)
+            cat <<EOF >> ${scriptdir}/pbuilderrc
+MIRRORSITE="http://192.168.1.135/debian-mipsel"
+OTHERMIRROR="deb http://pools.corp.deepin.com/mipsel-experimental unstable main|deb http://192.168.1.135/mipsel-staging raccoon main"
 EOF
-    fi
+            ;;
+        mips64el)
+            # override mirrors
+            cat <<EOF >> ${scriptdir}/pbuilderrc
+MIRRORSITE="http://192.168.1.135/mips64el"
+EOF
+            ;;
+    esac
 
     createdir ${WORKBASE}/deepin-chroot
 
@@ -471,9 +481,9 @@ build_package() {
         export DEBFULLNAME="Deepin/MIPS Team"
 
         if [[ -n $dscurl ]] ; then
-            dch -i -D unstable "${changelog}"
+            dch -i -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
         else
-            dch -v ${PKGVER} -D unstable "${changelog}"
+            dch -v ${PKGVER} -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
         fi
 
         if [[ $usepbuilder -eq 1 ]] ; then
@@ -584,7 +594,7 @@ scriptdir=$(dirname $(readlink -ef $0))
 # cowbuilder has not basetgz
 #    "--basetgz      ${WORKBASE}/deepin-base.tgz"
 declare -ar PBUILDEROPTS=(
-    "--distribution unstable"
+    "--distribution ${DISTRIBUTIONS[$ARCH]}"
     "--buildplace   ${WORKBASE}/deepin-chroot"
     "--hookdir      ${scriptdir}/pbuilder-hook.d"
     "--configfile   ${scriptdir}/pbuilderrc"
@@ -605,7 +615,7 @@ if [[ -z $dscurl ]] ; then
     [[ -z $workdir ]] && workdir=${WORKBASE}/${package}
 fi
 
-[[ -z $changelog ]] && changelog="Rebuild on mipsel"
+[[ -z $changelog ]] && changelog="Rebuild on ${DISTRIBUTIONS[${ARCH}]}"
 
 if [[ -n ${package} ]] ; then
     createdir $REPOBASE
