@@ -18,11 +18,16 @@ declare -r REPOBASE=${WORKBASE}/git-repos
 declare -r SVERSION="v0.1.0"
 declare -r DBPKGOPTS="-us -uc -sa -j8"
 declare -i CHANGELIST=
+declare -ra ARCHITECTURES=(
+    mipsel
+    mips64el
+)
 
 declare BOPTS=
 declare PKGVER=
+declare ARCH=$(dpkg-architecture -qDEB_HOST_ARCH)
 
-declare -r dde_components=(
+declare -ra dde_components=(
     dde-account-faces
     dde-api
     dde-calendar
@@ -38,7 +43,7 @@ declare -r dde_components=(
     startdde
 )
 
-declare -r raccoon_components=(
+declare -ra raccoon_components=(
     dbus-factory
     dde-api
     dde-control-center
@@ -60,13 +65,14 @@ printVersion() {
 printHelp() {
     cat <<EOF >&2
 Usage:
-  $0 [-c NUMBER] [-l CHANGELOG] -n PACKAGE|-d DSC [-t BRANCH] [-u HOST] [-w WORKDIR] [-b|-p] [-h] [-v]
+  $0 [-a ARCH] [-c NUMBER] [-l CHANGELOG] -n PACKAGE|-d DSC [-t BRANCH] [-u HOST] [-w WORKDIR] [-b|-p] [-h] [-v]
 
 Build script for deepin mipsel package team
 
 Help Options:
   -h, --help            Show help options
 Application Options:
+  -a, --arch=ARCH              Build package for ARCH architecture
   -c, --cl=NUMBER              Build package based on a CL: NUMBER
   -d, --dsc=DSC                Build package according to a DSC, DSC should be
                                a local path or url to Debian src control file
@@ -89,6 +95,7 @@ Examples:
   $0 -n dde-desktop -b                         Build dde-desktop from scratch
   $0 -n dde-desktop -b -u staging              Build dde-desktop then upload to staging
   $0 -n dde-api -p -n "Rebuild for testing"    Build dde-api in a clean pbuilder chroot
+  $0 -a mips64el -n base-files -p              Build base-files in a clean mips64el chroot
 EOF
     exit 0
 }
@@ -274,7 +281,7 @@ apply_patches() {
 }
 
 hasPbuilderChroot() {
-    if [[ -x ${WORKBASE}/base.cow/bin/ls ]] ; then
+    if [[ -x ${WORKBASE}/base.cow-${ARCH}/bin/ls ]] ; then
         return 0
     else
         return 1
@@ -301,6 +308,14 @@ EXTRAPACKAGES="lintian gccgo-5 eatmydata"
 # EATMYDATA=yes
 export LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}libeatmydata.so"
 EOF
+
+    if [[ $ARCH == mips64el ]] ; then
+    cat <<EOF >> ${scriptdir}/pbuilderrc
+MIRRORSITE="http://192.168.1.135/mips64el"
+OTHERMIRROR=""
+ARCHITECTURE="mipse64el"
+EOF
+    fi
 
     createdir ${WORKBASE}/deepin-chroot
 
@@ -491,8 +506,8 @@ upload_package() {
 [[ $EUID -eq 0 ]] && die "Don't build package with priviledged user"
 
 OPTS=$(getopt -n $0 \
-        -o 'c:d:l:n:t:u:w:bhpv' \
-        --long cl:,dsc:,changelog:,package:,target-branch:,upload:,workdir:,build,help,pbuilder,version \
+        -o 'a:c:d:l:n:t:u:w:bhpv' \
+        --long arch:,cl:,dsc:,changelog:,package:,target-branch:,upload:,workdir:,build,help,pbuilder,version \
         -- "$@")
 
 [[ $? -eq 0 ]] || die "Sorry! I don't understand!!!"
@@ -501,6 +516,10 @@ eval set -- "${OPTS}"
 
 while : ; do
     case $1 in
+        -a|--arch)
+            ARCH=$2
+            shift 2
+            ;;
         -c|--cl)
             CHANGELIST=$2
             [[ $CHANGELIST -eq 0 ]] && die "CL $CHANGELIST is illegal"
@@ -558,6 +577,8 @@ while : ; do
     esac
 done
 
+contains $ARCH ${ARCHITECTURES[@]} || die "$ARCH is an unsupported architecture"
+
 scriptdir=$(dirname $(readlink -ef $0))
 
 # cowbuilder has not basetgz
@@ -575,7 +596,7 @@ declare -r PBUILDEREXTRAOPTS=(
 )
 
 declare -ar COWBUILDEROPTS=(
-    "--basepath     ${WORKBASE}/base.cow"
+    "--basepath     ${WORKBASE}/base.cow-${ARCH}"
     "--buildplace   ${WORKBASE}/deepin-chroot"
 )
 
