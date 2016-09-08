@@ -299,7 +299,7 @@ initializePbuilder() {
     # Always overwrite the configuration
     cat <<EOF > ${scriptdir}/pbuilderrc
 AUTO_DEBSIGN=no
-ARCHITECTURE="${DISTRIBUTIONS[${ARCH}]}"
+ARCHITECTURE="${ARCH}"
 BINDMOUNT="$WORKBASE"
 ALLOWUNTRUSTED=yes
 DEBOOTSTRAPOPTS=( '--variant=buildd' '--no-check-gpg' )
@@ -515,7 +515,7 @@ uploadArtifacts() {
 }
 
 ##########
-# Operation start from here
+# Real operation starts
 ##############################
 [[ $EUID -eq 0 ]] && die "Don't build package with priviledged user"
 
@@ -612,7 +612,7 @@ declare -ar COWBUILDEROPTS=(
     "--buildplace   ${WORKBASE}/deepin-chroot"
 )
 
-[[ -z $changelog ]] && changelog="Rebuild on ${DISTRIBUTIONS[${ARCH}]}"
+[[ -z $changelog ]] && changelog="Rebuild on ${ARCH}"
 
 if [[ -n ${package} ]] ; then
     createdir $REPOBASE
