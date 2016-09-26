@@ -1,6 +1,6 @@
 #! /bin/bash
 
-declare -r BASEURI=http://cr.deepin.io
+declare -r BASEURI=https://cr.deepin.io
 declare -r SVERSION="v0.1.5"
 declare -r DBPKGOPTS="-us -uc -sa -j8"
 declare -i CHANGELIST=
