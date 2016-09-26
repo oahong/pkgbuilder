@@ -343,6 +343,11 @@ checkValidURL() {
 }
 
 printBuildInfo() {
+    local builder='NULL'
+
+    [[ $do_build -eq 1 ]] && builder=debuild
+    [[ $usepbuilder -eq 1 ]] && builder=cowbuilder
+
 cat <<EOF
 We're working on
     package:        $package
@@ -350,6 +355,7 @@ We're working on
     CL:             $CHANGELIST
     repository:     $repository
     dsc:            $dscurl
+    builder:        $builder
 EOF
 }
 
