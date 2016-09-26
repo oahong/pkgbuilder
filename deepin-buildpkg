@@ -1,21 +1,11 @@
 #! /bin/bash
-# TODO:
-#   1. rewrite
-#   2. git-buildpackage
-#   3. use dpkg-buildpackage hooks
-# Features:
-#   1. gerrit/git-review support
-#   2. pbuilder support
-#   3. dget and dput wrapper
-#   4. cowbuilder (eatmydata) support
-#   5. support mipsel and mips64el archs
 
 set -e
 
 source lib/common
 
 declare -ra modules=(
-    config/{env,dde}
+    conf/{env,dde}
     lib/{utils,modules}
 )
 
@@ -24,7 +14,7 @@ printHelp() {
 Usage:
   $0 -n PACKAGE|-d DSC [-a ARCH] [-c NUMBER] [-l CHANGELOG] [-t BRANCH] [-u HOST] [-w WORKDIR] [-b|-p] [-h] [-v]
 
-Build script for deepin mips team
+Package builder for deepin mips team
 
 Help Options:
   -h, --help            Show help options
@@ -137,24 +127,7 @@ declare -r scriptdir=$(dirname $(readlink -ef $0))
 declare -r WORKBASE=${scriptdir%/*}
 declare -r REPOBASE=${WORKBASE}/git-repos
 
-# cowbuilder has not basetgz
-#    "--basetgz      ${WORKBASE}/deepin-base.tgz"
-declare -ar PBUILDEROPTS=(
-    "--distribution ${DISTRIBUTIONS[$ARCH]}"
-    "--buildplace   ${WORKBASE}/deepin-chroot"
-    "--hookdir      ${scriptdir}/pbuilder-hook.d"
-    "--configfile   ${scriptdir}/pbuilderrc"
-)
-
-# buildresult must be specifed as pdebuild option
-declare -r PBUILDEREXTRAOPTS=(
-    "--buildresult  ${WORKBASE}/${package}"
-)
-
-declare -ar COWBUILDEROPTS=(
-    "--basepath     ${WORKBASE}/base.cow-${ARCH}"
-    "--buildplace   ${WORKBASE}/deepin-chroot"
-)
+loadModule conf/cowbuilder
 
 [[ -z $changelog ]] && changelog="Rebuild on ${ARCH}"
 

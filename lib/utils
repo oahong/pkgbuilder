@@ -112,15 +112,13 @@ hasPbuilderChroot() {
     fi
 }
 
-initializePbuilder() {
-    hasBin pbuilder || die "Install pbuilder!!!"
-    hasBin cowbuilder || die "Install cowbuilder!!!"
-
+configPbuilder() {
+    local pbuilderrc=$1
     # Should I use options instead of configuration?
     echo "Initialize pbuilder configuration"
 
     # Always overwrite the configuration
-    cat <<EOF > ${scriptdir}/pbuilderrc
+    cat <<EOF > $pbuilderrc
 AUTO_DEBSIGN=no
 ARCHITECTURE="${ARCH}"
 BINDMOUNT="$WORKBASE"
@@ -146,6 +144,13 @@ MIRRORSITE="http://192.168.1.135/mips64el"
 EOF
             ;;
     esac
+}
+
+initializePbuilder() {
+    hasBin pbuilder   || die "Install pbuilder!!!"
+    hasBin cowbuilder || die "Install cowbuilder!!!"
+
+    configPbuilder ${scriptdir}/pbuilderrc
 
     createdir ${WORKBASE}/deepin-chroot
 
