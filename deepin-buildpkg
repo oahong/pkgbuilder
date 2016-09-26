@@ -67,7 +67,7 @@ printVersion() {
 printHelp() {
     cat <<EOF >&2
 Usage:
-  $0 [-a ARCH] [-c NUMBER] [-l CHANGELOG] -n PACKAGE|-d DSC [-t BRANCH] [-u HOST] [-w WORKDIR] [-b|-p] [-h] [-v]
+  $0 -n PACKAGE|-d DSC [-a ARCH] [-c NUMBER] [-l CHANGELOG] [-t BRANCH] [-u HOST] [-w WORKDIR] [-b|-p] [-h] [-v]
 
 Build script for deepin mips team
 
