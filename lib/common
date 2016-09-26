@@ -1,0 +1,76 @@
+#! /bin/bash
+
+die() {
+    echo "$BASH_LINENO: $@" >&2
+    exit 1
+}
+
+printVersion() {
+    echo "$0 version $SVERSION"
+    exit 0
+}
+
+hasBin() {
+    local executable=$1
+    if [[ -n $(type $1) ]] ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+hasPackage() {
+    local pkg=$1
+    if dpkg-query -f '${binary:Package}\n' -W | grep -wqs $pkg ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+loadModule() {
+    local modules=${@}
+    for module in ${modules} ; do
+        if [[ -f ${module} ]] ; then
+            source ${module}
+        else
+            echo "Not able to load ${module}"
+            exit 1
+        fi
+    done
+}
+
+assert() {
+    local ret
+    eval ret=\$${1}
+    [[ -n $ret ]] || die "I'm confused, var: ${1} is empty"
+}
+
+pushd() {
+    builtin pushd $@ >& /dev/null
+}
+
+popd() {
+    builtin popd $@ >& /dev/null
+}
+
+contains() {
+    local element=
+    local result=1
+    for element in ${@:2}; do
+    if [[ $element == $1 ]] ; then
+        result=0
+        break
+    fi
+    done
+    return $result
+}
+
+createdir() {
+    local dir=$1
+    local desc=$2
+    if [[ ! -d ${dir} ]];then
+        echo "create $2 directory: $dir"
+        mkdir -p $dir
+    fi
+}

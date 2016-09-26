@@ -1,0 +1,197 @@
+#! /bin/bash
+
+hasPatch() {
+    if [[ -d $patchdir ]] ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+pkgIsDebianized() {
+    if [[ -d debian ]] ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+dquilt() {
+    local quiltrc=${HOME}/.quiltrc-dpkg
+
+    hasBin quilt || die "Install quilt!!!"
+
+    if [[ ! -f $quiltrc ]] ; then
+        echo "Write quilt configuration: $quiltrc"
+
+        cat <<'EOF' >>$quiltrc
+d=. ; while [ ! -d $d/debian -a `readlink -e $d` != / ]; do d=$d/..; done
+if [ -d $d/debian ] && [ -z $QUILT_PATCHES ]; then
+    # if in Debian packaging tree with unset $QUILT_PATCHES
+    QUILT_PATCHES="debian/patches"
+    QUILT_PATCH_OPTS="--reject-format=unified"
+    QUILT_DIFF_ARGS="-p ab --no-timestamps --no-index --color=auto"
+    QUILT_REFRESH_ARGS="-p ab --no-timestamps --no-index"
+    QUILT_COLORS="diff_hdr=1;32:diff_add=1;34:diff_rem=1;31:diff_hunk=1;33:diff_ctx=35:diff_cctx=33"
+    if ! [ -d $d/debian/patches ]; then mkdir $d/debian/patches; fi
+fi
+EOF
+    fi
+
+    quilt --quiltrc=${quiltrc} -f $@
+}
+
+debsrcFormatter() {
+    local sformat=
+    local sformatfile=debian/source/format
+    local quilt="3.0 (quilt)"
+
+    if [[ -f $sformatfile ]] ; then
+        sformat=$(cat $sformatfile)
+    fi
+
+    if [[ $sformat =~ 3.0[[:space:]]\((native|quilt)\) ]] ; then
+        echo "${package} has debsrc 3.0 format: $sformat"
+    fi
+
+    if hasPatch; then
+        echo "Found patches, set package source format to debsrc 3.0 quilt"
+        sformat=$quilt
+        createdir ${sformatfile//format}; echo $sformat > ${sformatfile}
+    fi
+
+    if [[ $sformat == $quilt ]] ; then
+        PKGVER="${PKGVER}-1"
+        echo -e "\n\n\n\n\t\t\tI'm here PKGVER=${PKGVER}\n\n\n"
+    fi
+}
+
+fixBuildDeps() {
+    echo "Replace golang-go in build deps with gccgo-5"
+    if pkgIsDebianized ; then
+        sed -e 's@golang-go\s*,@gccgo-5 | &@g' -i debian/control
+    fi
+}
+
+fixDebuildOptions() {
+    if pkgIsDebianized ; then
+        if grep -wqs golang-go debian/control ; then
+            echo "Golang package detected, trying to fix debuild option"
+            BOPTS+="-e USE_GGCGO=1 -e CGO_ENABLED=1 "
+        fi
+    fi
+
+    [[ $package == deepin-file-manager-backend ]] && \
+        BOPTS+="-e CGO_LDTHREAD=-lpthread"
+
+    # package test maybe fail, force return true
+    return 0
+}
+
+applyPatches() {
+    pkgIsDebianized || \
+        die "You should debianize your package, cwd: $PWD!!!"
+
+    local patchdir=${scriptdir}/patches/${package}
+
+    if hasPatch $patchdir ; then
+        debsrcFormatter
+
+        for patch in $patchdir/*.patch; do
+            echo "Import mips specific patch: $(basename $patch)"
+            dquilt import $patch
+        done
+    fi
+}
+
+hasPbuilderChroot() {
+    if [[ -x ${WORKBASE}/base.cow-${ARCH}/bin/ls ]] ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+initializePbuilder() {
+    hasBin pbuilder || die "Install pbuilder!!!"
+    hasBin cowbuilder || die "Install cowbuilder!!!"
+
+    # Should I use options instead of configuration?
+    echo "Initialize pbuilder configuration"
+
+    # Always overwrite the configuration
+    cat <<EOF > ${scriptdir}/pbuilderrc
+AUTO_DEBSIGN=no
+ARCHITECTURE="${ARCH}"
+BINDMOUNT="$WORKBASE"
+ALLOWUNTRUSTED=yes
+DEBOOTSTRAPOPTS=( '--variant=buildd' '--no-check-gpg' )
+EXTRAPACKAGES="lintian gccgo-5 eatmydata"
+# pbuilder >= 0.225
+# EATMYDATA=yes
+export LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}libeatmydata.so"
+EOF
+
+    case $ARCH in
+        mipsel)
+            cat <<EOF >> ${scriptdir}/pbuilderrc
+MIRRORSITE="http://192.168.1.135/debian-mipsel"
+OTHERMIRROR="deb http://pools.corp.deepin.com/mipsel-experimental unstable main|deb http://192.168.1.135/mipsel-staging raccoon main"
+EOF
+            ;;
+        mips64el)
+            # override mirrors
+            cat <<EOF >> ${scriptdir}/pbuilderrc
+MIRRORSITE="http://192.168.1.135/mips64el"
+EOF
+            ;;
+    esac
+
+    createdir ${WORKBASE}/deepin-chroot
+
+    sudo cowbuilder --create	 \
+         ${PBUILDEROPTS[@]}	 \
+         ${PBUILDEREXTRAOPTS[@]} \
+         ${COWBUILDEROPTS[@]}
+}
+
+# taken from http://stackoverflow.com/questions/3183444/check-for-valid-link-url
+checkValidURL() {
+    regex='(https?|ftp|file)://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]'
+    if [[ $1 =~ $regex ]] ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+printBuildInfo() {
+    local builder='NULL'
+
+    [[ $do_build -eq 1 ]] && builder=debuild
+    [[ $usepbuilder -eq 1 ]] && builder=cowbuilder
+
+cat <<EOF
+We're working on
+    package:        $package
+    changelog:      $changelog
+    CL:             $CHANGELIST
+    repository:     $repository
+    dsc:            $dscurl
+    builder:        $builder
+EOF
+}
+
+urlDecode() {
+    if echo $1 | grep -qs % ; then
+        echo -e "$(echo $1 | sed 's/+/ /g;s/%/\\x/g')"
+    else
+        echo $1
+    fi
+}
+
+createWorkdir() {
+    assert package
+    workdir=${WORKBASE}/${package}
+    createdir ${workdir}
+}

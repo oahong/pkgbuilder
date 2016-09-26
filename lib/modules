@@ -1,0 +1,148 @@
+#! /bin/bash
+
+downloadDebianSrc() {
+    local odscfile=$(basename ${dscurl})
+    local dscfile=$(urlDecode $odscfile)
+
+    package=${dscfile%%_*}
+    PKGVER=$(echo ${dscfile//.dsc} | sed -e "s/${package}_//")
+
+    createWorkdir
+
+    if checkValidURL $dscurl ; then
+        hasBin dget || die "Missing devscripts in the system"
+        pushd ${workdir}
+        dget -d -u ${dscurl}
+        # rename dscfile
+        [[ $odscfile == $dscfile ]] || mv $odscfile $dscfile
+        popd
+    fi
+
+    [[ -f ${workdir}/${dscfile} ]] || \
+        die "Invalid dsc file: $dscfile"
+    dscurl=$dscfile
+}
+
+createSrcArchives() {
+    createWorkdir
+
+    local work_branch=${targetbranch:=master}
+    local repodir=${REPOBASE}/${package}
+
+    if contains ${package} ${raccoon_components[@]} ; then
+        work_branch=raccoon
+        if [[ $work_branch != $targetbranch ]] ; then
+            echo -e "\n\t\tworking branch is not the target branch\n"
+        fi
+    fi
+
+    echo "Current branch is $work_branch"
+
+    hasBin git || die "Missing git in the system!!!"
+
+    # fetch git repository
+    [[ -d ${repodir}/.git ]] || git clone -b ${work_branch} ${repository} ${repodir}
+
+    pushd ${repodir}
+
+    # in case we need to switch branches
+    git checkout -B ${work_branch} --track origin/${work_branch}
+    git pull origin ${work_branch}
+
+    local commit_id=$(git rev-parse HEAD | cut -b 1-6)
+    assert commit_id
+    local tag=$(git describe --tags --abbrev=0)
+    local revision=$(git log ${tag}..origin/${work_branch} --oneline | wc -l)
+    assert revision
+
+    if [[ -z ${tag} ]] ;then
+        echo "tag fallback to 0.1"
+        tag=0.1
+    fi
+    assert tag
+
+    # gerrit CL workflow
+    if [[ ${CHANGELIST} -gt 1 ]] ; then
+        configGitReview
+        downloadGerritChange $CHANGELIST
+        PKGVER=$tag+cl~$CHANGELIST
+    else
+        PKGVER=$tag+r${revision}~${commit_id}
+    fi
+
+    echo "Create ${package} upstream source tarball..."
+    git archive --format=tar --prefix=${package}-${PKGVER}/ HEAD | \
+        xz -z > ${workdir}/${package}_${PKGVER}.orig.tar.xz
+
+    popd
+}
+
+prepareBuild() {
+    local srcdir=${workdir}/${package}-${PKGVER}
+    local srcpkg=${workdir}/${package}_${PKGVER}.orig.tar.xz
+
+    rm -rf $srcdir
+
+    if [[ -n $dscurl ]] ; then
+        dpkg-source -x ${workdir}/${dscurl} ${srcdir}
+    else
+        if [[ ! -f $srcpkg ]] ; then
+            srcpkg=${srcpkg/.orig/}
+            [[ -f $srcpkg ]] || die "src package $srcpkg not found"
+        fi
+
+        tar xf ${srcpkg} -C ${workdir}
+
+        pushd ${srcdir}
+        if ! pkgIsDebianized ; then
+            cp -a ${WORKBASE}/pkg_debian/${package}/debian .
+        fi
+        popd
+    fi
+}
+
+buildPackage() {
+    pushd ${workdir}/${package}-${PKGVER}
+
+    # Apply patches unless build official package (Not from any CL)
+    [[ $CHANGELIST -eq 0 ]] && applyPatches
+
+    fixBuildDeps
+    fixDebuildOptions
+
+    if [[ $do_build -eq 1 ]] ; then
+        export DEBEMAIL="mips@deepin.com"
+        export DEBFULLNAME="Deepin/MIPS Team"
+
+        if [[ -n $dscurl ]] ; then
+            dch -i -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
+        else
+            dch -v ${PKGVER} -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
+        fi
+
+        if [[ $usepbuilder -eq 1 ]] ; then
+            export ${BOPTS//-e}
+            hasPackage eatmydata  ||   \
+                die "Please install eatmydata on the build host!!!"
+
+            hasPbuilderChroot || initializePbuilder
+            eval pdebuild --pbuilder cowbuilder \
+                --use-pdebuild-internal         \
+                --debbuildopts '"${DBPKGOPTS}"' \
+                ${PBUILDEREXTRAOPTS[@]}         \
+                --                              \
+                ${PBUILDEROPTS[@]}              \
+                ${COWBUILDEROPTS[@]}
+        else
+            echo "Debuild options: ${BOPTS} ${DBPKGOPTS}"
+            eval debuild ${BOPTS} ${DBPKGOPTS}
+        fi
+    fi
+    popd
+}
+
+uploadArtifacts() {
+    [[ -z $uhost ]] && return 0
+    hasBin dput || die "Missing dput in the system!!!"
+    dput -uf ${uhost} $(ls -At ${workdir}/*.changes| head -n 1)
+}

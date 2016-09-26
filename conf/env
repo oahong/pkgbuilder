@@ -1,0 +1,19 @@
+#! /bin/bash
+
+declare -r BASEURI=http://cr.deepin.io
+declare -r SVERSION="v0.1.5"
+declare -r DBPKGOPTS="-us -uc -sa -j8"
+declare -i CHANGELIST=
+
+declare BOPTS=
+declare PKGVER=
+declare ARCH=$(dpkg-architecture -qDEB_HOST_ARCH)
+
+declare -ra ARCHITECTURES=(
+    mipsel
+    mips64el
+)
+declare -rA DISTRIBUTIONS=(
+    ['mipsel']='unstable'
+    ['mips64el']='testing'
+)
