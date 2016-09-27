@@ -17,3 +17,7 @@ declare -rA DISTRIBUTIONS=(
     ['mipsel']='unstable'
     ['mips64el']='testing'
 )
+
+declare -r scriptdir=$(dirname $(readlink -ef $0))
+declare -r WORKBASE=${scriptdir%/*}
+declare -r REPOBASE=${WORKBASE}/git-repos

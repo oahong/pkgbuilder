@@ -123,10 +123,6 @@ done
 
 contains $ARCH ${ARCHITECTURES[@]} || die "$ARCH is an unsupported architecture"
 
-declare -r scriptdir=$(dirname $(readlink -ef $0))
-declare -r WORKBASE=${scriptdir%/*}
-declare -r REPOBASE=${WORKBASE}/git-repos
-
 loadModule conf/cowbuilder
 
 [[ -z $changelog ]] && changelog="Rebuild on ${ARCH}"
