@@ -2,12 +2,12 @@
 
 declare -r BASEURI=https://cr.deepin.io
 declare -r SVERSION="v0.1.5"
-declare -r DBPKGOPTS="-us -uc -sa -j8"
 declare -i CHANGELIST=
 
 declare BOPTS=
 declare PKGVER=
 declare ARCH=$(dpkg-architecture -qDEB_HOST_ARCH)
+declare DBPKGOPTS="-us -uc -sa -j8"
 
 declare -ra ARCHITECTURES=(
     mipsel

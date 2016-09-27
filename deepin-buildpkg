@@ -154,7 +154,7 @@ else
 fi
 printBuildInfo
 prepareBuild
-buildPackage
+buildPackage $@
 uploadArtifacts
 
 # vim: number tabstop=4 softtabstop=4 expandtab

@@ -102,6 +102,8 @@ prepareBuild() {
 }
 
 buildPackage() {
+    # override default dpkg-buildpackage options
+    DBPKGOPTS+=" $@"
     pushd ${workdir}/${package}-${PKGVER}
 
     # Apply patches unless build official package (Not from any CL)
