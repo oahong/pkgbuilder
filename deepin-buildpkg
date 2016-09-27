@@ -38,9 +38,11 @@ $0 will not issue any build command (pdebuild or debuild) unless -p or -b option
 
 Examples:
   $0 -n dde-desktop                            Prepare for building dde-destop
+  $0 -n dde-desktop -c 64380 -p                Build dde-desktop with gerrit change 64380
+                                               in a pbuilder chroot
   $0 -n dde-desktop -b                         Build dde-desktop from scratch
   $0 -n dde-desktop -b -u staging              Build dde-desktop then upload to staging
-  $0 -n dde-api -p -n "Rebuild for testing"    Build dde-api in a clean pbuilder chroot
+  $0 -n dde-api -p -l "Rebuild for testing"    Build dde-api in a clean pbuilder chroot
   $0 -a mips64el -n base-files -p              Build base-files in a clean mips64el chroot
 EOF
     exit 0
