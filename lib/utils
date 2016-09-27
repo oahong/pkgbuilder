@@ -22,7 +22,7 @@ dquilt() {
     hasBin quilt || die "Install quilt!!!"
 
     if [[ ! -f $quiltrc ]] ; then
-        echo "Write quilt configuration: $quiltrc"
+        info "Write quilt configuration: $quiltrc"
 
         cat <<'EOF' >>$quiltrc
 d=. ; while [ ! -d $d/debian -a `readlink -e $d` != / ]; do d=$d/..; done
@@ -51,23 +51,23 @@ debsrcFormatter() {
     fi
 
     if [[ $sformat =~ 3.0[[:space:]]\((native|quilt)\) ]] ; then
-        echo "${package} has debsrc 3.0 format: $sformat"
+        info "${package} has debsrc 3.0 format: $sformat"
     fi
 
     if hasPatch; then
-        echo "Found patches, set package source format to debsrc 3.0 quilt"
+        info "Found patches, set package source format to debsrc 3.0 quilt"
         sformat=$quilt
         createdir ${sformatfile//format}; echo $sformat > ${sformatfile}
     fi
 
     if [[ $sformat == $quilt ]] ; then
         PKGVER="${PKGVER}-1"
-        echo -e "\n\n\n\n\t\t\tI'm here PKGVER=${PKGVER}\n\n\n"
+        info "set PKGVER to ${PKGVER}"
     fi
 }
 
 fixBuildDeps() {
-    echo "Replace golang-go in build deps with gccgo-5"
+    info "Replace golang-go in build deps with gccgo-5"
     if pkgIsDebianized ; then
         sed -e 's@golang-go\s*,@gccgo-5 | &@g' -i debian/control
     fi
@@ -76,7 +76,7 @@ fixBuildDeps() {
 fixDebuildOptions() {
     if pkgIsDebianized ; then
         if grep -wqs golang-go debian/control ; then
-            echo "Golang package detected, trying to fix debuild option"
+            warn "Golang package detected, trying to fix debuild option"
             BOPTS+="-e USE_GGCGO=1 -e CGO_ENABLED=1 "
         fi
     fi
@@ -98,7 +98,7 @@ applyPatches() {
         debsrcFormatter
 
         for patch in $patchdir/*.patch; do
-            echo "Import mips specific patch: $(basename $patch)"
+            info "Import mips specific patch: $(basename $patch)"
             dquilt import $patch
         done
     fi
@@ -115,7 +115,7 @@ hasPbuilderChroot() {
 configPbuilder() {
     local pbuilderrc=$1
     # Should I use options instead of configuration?
-    echo "Initialize pbuilder configuration"
+    info "Initialize pbuilder configuration"
 
     # Always overwrite the configuration
     cat <<EOF > $pbuilderrc

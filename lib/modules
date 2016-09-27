@@ -32,11 +32,11 @@ createSrcArchives() {
     if contains ${package} ${raccoon_components[@]} ; then
         work_branch=raccoon
         if [[ $work_branch != $targetbranch ]] ; then
-            echo -e "\n\t\tworking branch is not the target branch\n"
+            warn "\t\tworking branch is not the target branch"
         fi
     fi
 
-    echo "Current branch is $work_branch"
+    info "Current branch is $work_branch"
 
     hasBin git || die "Missing git in the system!!!"
 
@@ -56,7 +56,7 @@ createSrcArchives() {
     assert revision
 
     if [[ -z ${tag} ]] ;then
-        echo "tag fallback to 0.1"
+        info "tag fallback to 0.1"
         tag=0.1
     fi
     assert tag
@@ -70,7 +70,7 @@ createSrcArchives() {
         PKGVER=$tag+r${revision}~${commit_id}
     fi
 
-    echo "Create ${package} upstream source tarball..."
+    info "Create ${package} upstream source tarball..."
     git archive --format=tar --prefix=${package}-${PKGVER}/ HEAD | \
         xz -z > ${workdir}/${package}_${PKGVER}.orig.tar.xz
 
@@ -134,7 +134,7 @@ buildPackage() {
                 ${PBUILDEROPTS[@]}              \
                 ${COWBUILDEROPTS[@]}
         else
-            echo "Debuild options: ${BOPTS} ${DBPKGOPTS}"
+            info "Debuild options: ${BOPTS} ${DBPKGOPTS}"
             eval debuild ${BOPTS} ${DBPKGOPTS}
         fi
     fi

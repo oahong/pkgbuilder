@@ -1,8 +1,23 @@
 #! /bin/bash
 
+declare -Ar color=(
+    ['reset']='\e[0m'
+    ['error']='\e[1m\e[31m'
+    ['info']='\e[1m\e[32m'
+    ['warn']='\e[1m\e[33m'
+)
+
 die() {
-    echo "$BASH_LINENO: $@" >&2
+    echo -e "${color[error]}E:${color[reset]} $BASH_LINENO: $@" >&2
     exit 1
+}
+
+info() {
+    echo -e "${color[info]}I:${color[reset]} $@"
+}
+
+warn() {
+    echo -e "${color[warn]W:${color[reset]} $@"
 }
 
 printVersion() {
@@ -34,8 +49,7 @@ loadModule() {
         if [[ -f ${module} ]] ; then
             source ${module}
         else
-            echo "Not able to load ${module}"
-            exit 1
+            die "Not able to load ${module}"
         fi
     done
 }
@@ -70,7 +84,7 @@ createdir() {
     local dir=$1
     local desc=$2
     if [[ ! -d ${dir} ]];then
-        echo "create $2 directory: $dir"
+        info "create $2 directory: $dir"
         mkdir -p $dir
     fi
 }
