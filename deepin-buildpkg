@@ -123,7 +123,7 @@ while : ; do
     esac
 done
 
-contains $ARCH ${ARCHITECTURES[@]} || die "$ARCH is an unsupported architecture"
+[[ -n ${ARCHITECTURES[$ARCH]} ]] || die "$ARCH is an unsupported architecture"
 
 loadModule conf/cowbuilder
 
@@ -133,7 +133,7 @@ if [[ -n ${package} ]] ; then
     createdir $REPOBASE
 
     # set git repository
-    if contains $package ${DDE_COMPONENTS[@]}; then
+    if [[ -n ${DDE_COMPONENTS[$package]} ]]; then
         repository=${BASEURI}/dde/${package}
     fi
 
