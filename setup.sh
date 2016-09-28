@@ -17,8 +17,6 @@ packages=(
     git
     git-review
     tmux
-    dget
-    dput
 )
 
 sudoers=examples/sudoers

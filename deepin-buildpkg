@@ -136,10 +136,6 @@ source ${scriptdir}/conf/cowbuilder
 if [[ -n ${package} ]] ; then
     createdir $REPOBASE
 
-    if [[ -n ${DDE_COMPONENTS[$package]} ]]; then
-        repository=${BASEURI}/dde/${package}
-    fi
-
     case ${package} in
         lastore-daemon*)
             repository=${BASEURI}/lastore/${package}
@@ -151,6 +147,10 @@ if [[ -n ${package} ]] ; then
             repository=${BASEURI}/${package}
             ;;
     esac
+
+    if [[ -n ${DDE_COMPONENTS[$package]} ]]; then
+        repository=${BASEURI}/dde/${package}
+    fi
 fi
 
 if [[ -n ${dscurl} ]] ;then
