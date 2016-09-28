@@ -178,7 +178,8 @@ buildPackage() {
         fi
 
         if [[ $usepbuilder -eq 1 ]] ; then
-            export ${BOPTS//-e}
+            BOPTS=${BOPTS//-e}
+            warn "set BOPTS to ${BOPTS:-NULL}"
 
             eval pdebuild --pbuilder cowbuilder \
                 --use-pdebuild-internal         \
