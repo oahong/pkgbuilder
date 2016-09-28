@@ -127,12 +127,13 @@ done
 
 loadModule conf/cowbuilder
 
+# set default changelog
 [[ -z $changelog ]] && changelog="Rebuild on ${ARCH}"
 
+# set git repository for dde components
 if [[ -n ${package} ]] ; then
     createdir $REPOBASE
 
-    # set git repository
     if [[ -n ${DDE_COMPONENTS[$package]} ]]; then
         repository=${BASEURI}/dde/${package}
     fi

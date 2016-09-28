@@ -1,5 +1,6 @@
 #! /bin/bash
 
+# DDE specific settings
 declare -ra DDE_COMPONENTS=(
     dde-account-faces
     dde-api
