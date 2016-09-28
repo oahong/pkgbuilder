@@ -17,7 +17,7 @@ info() {
 }
 
 warn() {
-    echo -e "${color[warn]W:${color[reset]} $@"
+    echo -e "${color[warn]}W:${color[reset]} $@"
 }
 
 printVersion() {

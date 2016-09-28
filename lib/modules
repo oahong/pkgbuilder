@@ -73,17 +73,15 @@ downloadDebianSrc() {
 createSrcArchives() {
     createWorkdir
 
-    local work_branch=${targetbranch:=master}
+    local work_branch=${CHECKOUT_BRANCH[${package}]:=master}
     local repodir=${REPOBASE}/${package}
 
-    if contains ${package} ${raccoon_components[@]} ; then
-        work_branch=raccoon
-        if [[ $work_branch != $targetbranch ]] ; then
-            warn "\t\tworking branch is not the target branch"
-        fi
-    fi
-
     info "Current branch is $work_branch"
+
+    if [[ -n $targetbranch ]] ; then
+        work_branch=$targetbranch
+        warn "Set branch to $targetbranch, according to command line options"
+    fi
 
     hasBin git || die "Missing git in the system!!!"
 

@@ -133,18 +133,21 @@ if [[ -n ${package} ]] ; then
     createdir $REPOBASE
 
     # set git repository
-    if contains $package ${dde_components[@]}; then
+    if contains $package ${DDE_COMPONENTS[@]}; then
         repository=${BASEURI}/dde/${package}
-    else
-        if [[ ${package} = lastore-daemon* ]]; then
-            repository=${BASEURI}/lastore/${package}
-        else
-            repository=${BASEURI}/${package}
-        fi
     fi
 
-    [[ ${package} == deepin-default-settings ]] && \
-        repository=${BASEURI}/${package##deepin-}
+    case ${package} in
+        lastore-daemon*)
+            repository=${BASEURI}/lastore/${package}
+            ;;
+        deepin-default-settings)
+            repository=${BASEURI}/${package##deepin-}
+            ;;
+        *)
+            repository=${BASEURI}/${package}
+            ;;
+    esac
 fi
 
 if [[ -n ${dscurl} ]] ;then

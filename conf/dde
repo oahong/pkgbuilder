@@ -1,6 +1,6 @@
 #! /bin/bash
 
-declare -ra dde_components=(
+declare -ra DDE_COMPONENTS=(
     dde-account-faces
     dde-api
     dde-calendar
@@ -16,16 +16,18 @@ declare -ra dde_components=(
     startdde
 )
 
-declare -ra raccoon_components=(
-    dbus-factory
-    dde-api
-    dde-control-center
-    dde-daemon
-    dde-desktop
-    dde-dock
-    dde-launcher
-    dde-session-ui
-    deepin-desktop-base
-    deepin-desktop-schemas
-    startdde
+declare -rA CHECKOUT_BRANCH=(
+    ['dbus-factory']=raccoon
+    ['dde-api']=raccoon
+    ['dde-control-center']=raccoon
+    ['dde-daemon']=raccoon
+    ['dde-desktop']=raccoon
+    ['dde-dock']=raccoon
+    ['dde-launcher']=raccoon
+    ['dde-session-ui']=raccoon
+    ['deepin-desktop-base']=raccoon
+    ['deepin-desktop-schemas']=raccoon
+    ['deepin-installer']=loongson
+    ['deepin-mutter']=release/3.20
+    ['startdde']=raccoon
 )
