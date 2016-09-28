@@ -112,54 +112,6 @@ hasPbuilderChroot() {
     fi
 }
 
-configPbuilder() {
-    local pbuilderrc=$1
-    # Should I use options instead of configuration?
-    info "Initialize pbuilder configuration"
-
-    # Always overwrite the configuration
-    cat <<EOF > $pbuilderrc
-AUTO_DEBSIGN=no
-ARCHITECTURE="${ARCH}"
-BINDMOUNT="$WORKBASE"
-ALLOWUNTRUSTED=yes
-DEBOOTSTRAPOPTS=( '--variant=buildd' '--no-check-gpg' )
-EXTRAPACKAGES="lintian gccgo-5 eatmydata"
-# pbuilder >= 0.225
-# EATMYDATA=yes
-export LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}libeatmydata.so"
-EOF
-
-    case $ARCH in
-        mipsel)
-            cat <<EOF >> ${scriptdir}/pbuilderrc
-MIRRORSITE="http://192.168.1.135/debian-mipsel"
-OTHERMIRROR="deb http://pools.corp.deepin.com/mipsel-experimental unstable main|deb http://192.168.1.135/mipsel-staging raccoon main"
-EOF
-            ;;
-        mips64el)
-            # override mirrors
-            cat <<EOF >> ${scriptdir}/pbuilderrc
-MIRRORSITE="http://192.168.1.135/mips64el"
-EOF
-            ;;
-    esac
-}
-
-initializePbuilder() {
-    hasBin pbuilder   || die "Install pbuilder!!!"
-    hasBin cowbuilder || die "Install cowbuilder!!!"
-
-    configPbuilder ${scriptdir}/pbuilderrc
-
-    createdir ${WORKBASE}/deepin-chroot
-
-    sudo cowbuilder --create	 \
-         ${PBUILDEROPTS[@]}	 \
-         ${PBUILDEREXTRAOPTS[@]} \
-         ${COWBUILDEROPTS[@]}
-}
-
 # taken from http://stackoverflow.com/questions/3183444/check-for-valid-link-url
 checkValidURL() {
     regex='(https?|ftp|file)://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]'

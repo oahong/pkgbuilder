@@ -100,8 +100,8 @@ while : ; do
             shift
             ;;
         -p|--pbuilder)
-            do_build=1
             usepbuilder=1
+            do_build=1
             shift
             ;;
         -h|--help)
@@ -154,6 +154,7 @@ else
 fi
 printBuildInfo
 prepareBuild
+createPbuilderChroot
 buildPackage $@
 uploadArtifacts
 
