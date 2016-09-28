@@ -17,6 +17,8 @@ packages=(
     git
     git-review
     tmux
+    dget
+    dput
 )
 
 sudoers=examples/sudoers
@@ -31,3 +33,9 @@ fi
 
 info "create executable link"
 ln -sfv ${scriptdir}/deepin-buildpkg /usr/local/bin
+
+mkdir -pv /work
+
+info "clone pkg_debian repository"
+git clone https://github.com/linuxdeepin/pkg_debian.git /work/pkg_debian
+
