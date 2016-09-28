@@ -73,7 +73,7 @@ downloadDebianSrc() {
 createSrcArchives() {
     createWorkdir
 
-    local work_branch=${CHECKOUT_BRANCH[${package}]:=master}
+    local work_branch=${CHECKOUT_BRANCH[${package}]:-master}
     local repodir=${REPOBASE}/${package}
 
     info "Current branch is $work_branch"
