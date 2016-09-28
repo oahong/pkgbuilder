@@ -10,11 +10,12 @@ if [[ EUID -ne 0 ]] ; then
 fi
 
 packages=(
-    git
-    devscripts
     cowbuilder
+    devscripts
     eatmydata
+    git
     git-review
+    tmux
 )
 
 sudoers=examples/sudoers
