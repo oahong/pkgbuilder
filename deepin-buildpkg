@@ -2,6 +2,8 @@
 
 set -e
 
+declare -r scriptdir=$(dirname $(readlink -ef $0))
+
 declare -ra modules=(
     conf/{env,dde}
     lib/{common,utils,modules}
@@ -52,7 +54,7 @@ EOF
 [[ $EUID -eq 0 ]] && die "Don't build package with priviledged user"
 
 for module in ${modules[@]}; do
-    source $module
+    source ${scriptdir}/$module
 done
 
 OPTS=$(getopt -n $0 \
@@ -125,7 +127,7 @@ done
 
 [[ -n ${ARCHITECTURES[$ARCH]} ]] || die "$ARCH is an unsupported architecture"
 
-source conf/cowbuilder
+source ${scriptdir}/conf/cowbuilder
 
 # set default changelog
 [[ -z $changelog ]] && changelog="Rebuild on ${ARCH}"
