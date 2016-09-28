@@ -43,17 +43,6 @@ hasPackage() {
     fi
 }
 
-loadModule() {
-    local mods=${@}
-    for module in ${mods} ; do
-        if [[ -f ${module} ]] ; then
-            source ${module}
-        else
-            die "Not able to load ${module}"
-        fi
-    done
-}
-
 assert() {
     local ret
     eval ret=\$${1}

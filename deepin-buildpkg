@@ -2,11 +2,9 @@
 
 set -e
 
-source lib/common
-
 declare -ra modules=(
     conf/{env,dde}
-    lib/{utils,modules}
+    lib/{common,utils,modules}
 )
 
 printHelp() {
@@ -53,7 +51,7 @@ EOF
 ##############################
 [[ $EUID -eq 0 ]] && die "Don't build package with priviledged user"
 
-loadModule ${modules[@]}
+source ${modules[@]}
 
 OPTS=$(getopt -n $0 \
         -o 'a:c:d:l:n:t:u:bhpv' \
@@ -125,7 +123,7 @@ done
 
 [[ -n ${ARCHITECTURES[$ARCH]} ]] || die "$ARCH is an unsupported architecture"
 
-loadModule conf/cowbuilder
+source conf/cowbuilder
 
 # set default changelog
 [[ -z $changelog ]] && changelog="Rebuild on ${ARCH}"
