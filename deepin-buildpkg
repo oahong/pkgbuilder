@@ -51,7 +51,7 @@ EOF
 ##########
 # Real operation starts
 ##############################
-[[ $EUID -eq 0 ]] && die "Don't build package with priviledged user"
+[[ $EUID -eq 0 ]] && warn "You should build package with an unpriviledged user"
 
 for module in ${modules[@]}; do
     source ${scriptdir}/$module
