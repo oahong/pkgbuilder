@@ -10,6 +10,7 @@ if [[ EUID -ne 0 ]] ; then
 fi
 
 packages=(
+    build-essential
     cowbuilder
     devscripts
     eatmydata
