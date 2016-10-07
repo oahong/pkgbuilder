@@ -17,6 +17,9 @@ packages=(
     git
     git-review
     tmux
+    quilt
+    dget
+    dput
 )
 
 sudoers=examples/sudoers
@@ -36,4 +39,3 @@ mkdir -pv /work
 
 info "clone pkg_debian repository"
 git clone https://github.com/linuxdeepin/pkg_debian.git /work/pkg_debian
-
