@@ -14,25 +14,12 @@ BINDMOUNT="$WORKBASE"
 ALLOWUNTRUSTED=yes
 DEBOOTSTRAPOPTS=( '--variant=buildd' '--no-check-gpg' )
 EXTRAPACKAGES="lintian gccgo-5 eatmydata"
+MIRRORSITE="${MIRRORSITE[${ARCH}]}"
+OTHERMIRROR="${OTHERMIRROR[${ARCH}]}"
 # pbuilder >= 0.225
 # EATMYDATA=yes
 export LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}libeatmydata.so"
 EOF
-
-    case $ARCH in
-        mipsel)
-            cat <<EOF >> ${scriptdir}/pbuilderrc
-MIRRORSITE="http://192.168.1.135/debian-mipsel"
-OTHERMIRROR="deb http://pools.corp.deepin.com/mipsel-experimental unstable main|deb http://192.168.1.135/mipsel-staging raccoon main"
-EOF
-            ;;
-        mips64el)
-            # override mirrors
-            cat <<EOF >> ${scriptdir}/pbuilderrc
-MIRRORSITE="http://192.168.1.135/mips64el"
-EOF
-            ;;
-    esac
 }
 
 initializePbuilder() {
