@@ -128,6 +128,7 @@ printBuildInfo() {
     [[ $do_build -eq 1 ]] && builder=debuild
     [[ $usepbuilder -eq 1 ]] && builder=cowbuilder
 
+    einfo "Build script version: $sversion"
 cat <<EOF
 We're working on
     package:        $package
