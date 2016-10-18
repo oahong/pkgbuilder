@@ -165,7 +165,7 @@ buildPackage() {
         fi
 
         if [[ $usepbuilder -eq 1 ]] ; then
-            BOPTS=${BOPTS//-e}
+            export BOPTS=${BOPTS//-e}
             warn "set BOPTS to ${BOPTS:-NULL}"
 
             eval pdebuild --pbuilder cowbuilder \
