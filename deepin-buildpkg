@@ -5,7 +5,7 @@ set -e
 declare -r scriptdir=$(dirname $(readlink -ef $0))
 
 declare -ra modules=(
-    conf/{env,dde}
+    conf/{env,dde,mirrors}
     lib/{common,utils,modules}
 )
 

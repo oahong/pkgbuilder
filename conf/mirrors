@@ -1,0 +1,11 @@
+#! /bin/bash
+
+declare -Ar MIRRORSITE=(
+    [mipsel]='http://192.168.1.135/debian-mipsel'
+    [mips64el]='deb http://pools.corp.deepin.com/mipsel-experimental unstable main|deb http://192.168.1.135/mipsel-staging raccoon main'
+)
+
+declare -Ar OTHERMIRROR=(
+    [mipsel]='http://192.168.1.135/mips64el'
+    [mips64el]=''
+)
