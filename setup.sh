@@ -29,7 +29,7 @@ apt-get install ${packages[@]}
 
 if [[ -f ${sudoers} ]] ; then
     info "Install sudoers configuration"
-    install -m 600 -v $sudoers /etc/sudoers.d/deepin.conf
+    install -m 600 -v $sudoers /etc/sudoers.d/deepin_pbuilder
 fi
 
 info "create executable link"
