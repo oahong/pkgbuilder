@@ -71,7 +71,7 @@ printHelp() {
 Usage:
   $0 -n PACKAGE|-d DSC [-a ARCH] [-c NUMBER] [-l CHANGELOG] [-t BRANCH] [-u HOST] [-w WORKDIR] [-b|-p] [-h] [-v]
 
-Package builder for deepin mips team
+Package builder for deepin mips team, version $SVERSION
 
 Help Options:
   -h, --help            Show help options
