@@ -34,6 +34,25 @@ initializePbuilder() {
          ${COWBUILDEROPTS[@]}
 }
 
+
+configGitReview() {
+    echo "create per project gitreview configuration"
+    if [[ ! -f .gitreview ]] ; then
+        cat <<EOF > .gitreview
+[gerrit]
+defaultremote = origin
+EOF
+    fi
+}
+
+downloadGerritChange() {
+    if hasBin git-review ; then
+        git review -d $1
+    else
+        die "Missing git-review in the system!!!"
+    fi
+}
+
 downloadDebianSrc() {
     local odscfile=$(basename ${dscurl})
     local dscfile=$(urlDecode $odscfile)
