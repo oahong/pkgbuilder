@@ -185,7 +185,12 @@ buildPackage() {
 
         if [[ $usepbuilder -eq 1 ]] ; then
             export BOPTS=${BOPTS//-e}
-            warn "set BOPTS to ${BOPTS:-NULL}"
+            warn "Set BOPTS to ${BOPTS:-NULL}"
+
+            if [[ ${ARCH} == mipsel ]] ; then
+                warn "${ARCH} Set environment to make package build against gccgo"
+                export USE_CGO=1 CGO_ENABLED=1
+            fi
 
             eval pdebuild --pbuilder cowbuilder \
                 --use-pdebuild-internal         \
