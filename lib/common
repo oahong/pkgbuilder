@@ -20,11 +20,6 @@ warn() {
     echo -e "${color[warn]}W:${color[reset]} $@"
 }
 
-printVersion() {
-    echo "$0 version $SVERSION"
-    exit 0
-}
-
 hasBin() {
     local executable=$1
     if [[ -n $(type $1) ]] ; then
@@ -69,7 +64,7 @@ createdir() {
 printHelp() {
     cat <<EOF >&2
 Usage:
-  $0 -n PACKAGE|-d DSC [-a ARCH] [-c NUMBER] [-l CHANGELOG] [-t BRANCH] [-u HOST] [-w WORKDIR] [-b|-p] [-h] [-v]
+  $0 -n PACKAGE|-d DSC [-a ARCH] [-c NUMBER] [-l CHANGELOG] [-t BRANCH] [-u HOST] [-w WORKDIR] [-b|-p] [-h]
 
 Package builder for deepin mips team, version $SVERSION
 
@@ -88,7 +83,6 @@ Application Options:
   -b, --build                  Perform a package build using debuild
   -p, --pbuilder               Perform a package build using pbuilder
                                (recommended for a clean buid)
-  -v, --version                Show version
 
 Note:
 $0 will not issue any build command (pdebuild or debuild) unless -p or -b option is specified.

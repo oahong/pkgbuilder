@@ -19,8 +19,8 @@ done
 [[ $EUID -eq 0 ]] && warn "You should build package with an unpriviledged user"
 
 OPTS=$(getopt -n $0 \
-        -o 'a:c:d:l:n:t:u:bhpv' \
-        --long arch:,cl:,dsc:,changelog:,package:,target-branch:,upload:,build,help,pbuilder,version \
+        -o 'a:c:d:l:n:t:u:bhp' \
+        --long arch:,cl:,dsc:,changelog:,package:,target-branch:,upload:,build,help,pbuilder \
         -- "$@")
 
 [[ $? -eq 0 ]] || die "Sorry! I don't understand!!!"
@@ -69,10 +69,6 @@ while : ; do
             ;;
         -h|--help)
             printHelp
-            shift
-            ;;
-        -v|--version)
-            printVersion
             shift
             ;;
         --)
