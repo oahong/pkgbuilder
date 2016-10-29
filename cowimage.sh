@@ -1,0 +1,28 @@
+#! /bin/bash
+
+declare -r scriptdir=$(dirname $(readlink -ef $0))
+
+for config in conf/{env,mirrors,cowbuilder} ; do
+   source $config
+done
+
+MYPBOPTIONS=(
+    ${PBUILDEROPTS[@]}
+    ${COWBUILDEROPTS[@]}
+)
+
+case $1 in
+    update)
+	sudo cowbuilder --update ${MYPBOPTIONS[@]}
+	;;
+    login)
+	sudo cowbuilder --login --save ${MYPBOPTIONS[@]}
+	;;
+    *)
+	echo "Usage: $0 update|login"
+	exit 1
+	;;
+    *)
+	
+esac
+
