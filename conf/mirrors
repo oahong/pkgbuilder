@@ -1,7 +1,7 @@
 #! /bin/bash
 
 declare -Ar MIRRORSITE=(
-    [mipsel]='http://dserver.deepin.sh/debian-mipsel'
+    [mipsel]='http://dserver.deepin.sh/mipsel'
     [mips64el]='http://dserver.deepin.sh/mips64el'
 )
 
