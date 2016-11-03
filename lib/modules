@@ -91,8 +91,13 @@ createSrcArchives() {
 
     hasBin git || die "Missing git in the system!!!"
 
-    # fetch git repository
-    [[ -d ${repodir}/.git ]] || git clone -b ${work_branch} ${repository} ${repodir}
+    if [[ -d ${repodir}/.git ]] ; then
+        # clone git repository
+        git clone -b ${work_branch} ${repository} ${repodir}
+    else
+        # set origin url
+        git remote set-url origin ${repository}
+    fi
 
     pushd ${repodir}
 
