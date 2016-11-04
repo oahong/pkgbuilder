@@ -3,7 +3,7 @@
 declare -r scriptdir=$(dirname $(readlink -ef $0))
 
 for config in conf/{env,mirrors,cowbuilder} ; do
-   source $config
+   source ${scriptdir}/${config}
 done
 
 MYPBOPTIONS=(
