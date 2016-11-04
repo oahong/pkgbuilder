@@ -82,15 +82,17 @@ while : ; do
     esac
 done
 
-[[ -n ${ARCHITECTURES[$ARCH]} ]] || die "$ARCH is an unsupported architecture"
+if [[ -z ${ARCHITECTURES[$ARCH]} ]] ; then
+    die "$ARCH is an unsupported architecture"
+fi
 
 source ${scriptdir}/conf/cowbuilder
 
 # set default changelog
 [[ -z $changelog ]] && changelog="Rebuild on ${ARCH}"
 
-# set git repository for dde components
 if [[ -n ${package} ]] ; then
+    # set git repository for deepin components
     createdir $REPOBASE
 
     case ${package} in
@@ -108,15 +110,15 @@ if [[ -n ${package} ]] ; then
     if [[ -n ${DDE_COMPONENTS[$package]} ]]; then
         repository=${BASEURI}/dde/${package}
     fi
+    #Create source package for deepin components
+    createSrcArchives
+elif [[ -n ${dscurl} ]] ; then
+    downloadDebianSrc
 fi
 
-if [[ -n ${dscurl} ]] ;then
-    downloadDebianSrc
-else
-    createSrcArchives
-fi
 printBuildInfo
 prepareBuild
+
 createPbuilderChroot
 buildPackage $@
 uploadArtifacts
