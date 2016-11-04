@@ -130,7 +130,7 @@ printBuildInfo() {
 
     info "Build script version: $SVERSION"
 cat <<EOF
-We're working on
+We're building on architecture $ARCH:
     package:        $package
     changelog:      $changelog
     CL:             $CHANGELIST
