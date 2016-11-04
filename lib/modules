@@ -158,9 +158,8 @@ prepareBuild() {
 }
 
 createPbuilderChroot() {
-    configPbuilder ${scriptdir}/pbuilderrc
-
     if [[ ${usepbuilder} -eq 1 ]] ; then
+        configPbuilder ${scriptdir}/pbuilderrc
         hasPackage eatmydata  ||   \
             die "Please install eatmydata on the build host!!!"
         hasPbuilderChroot || initializePbuilder
