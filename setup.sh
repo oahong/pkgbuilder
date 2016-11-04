@@ -33,6 +33,7 @@ if [[ -f ${sudoers} ]] ; then
 fi
 
 info "create executable link"
+ln -sfv ${scriptdir}/cowimage /usr/local/bin
 ln -sfv ${scriptdir}/deepin-buildpkg /usr/local/bin
 
 mkdir -pv /work
