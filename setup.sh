@@ -2,6 +2,8 @@
 
 set -e
 
+declare -r scriptdir=$(dirname $(readlink -ef $0))
+
 source conf/env
 source lib/common
 
@@ -18,7 +20,6 @@ packages=(
     git-review
     tmux
     quilt
-    dget
     dput
 )
 
@@ -36,7 +37,11 @@ info "create executable link"
 ln -sfv ${scriptdir}/cowimage /usr/local/bin
 ln -sfv ${scriptdir}/deepin-buildpkg /usr/local/bin
 
-mkdir -pv /work
+mkdir -pv ${WORKBASE}
 
-info "clone pkg_debian repository"
-git clone https://github.com/linuxdeepin/pkg_debian.git /work/pkg_debian
+if [[ -d ${WORKBASE}/pkg_debian/.git ]] ; then
+	info "A copy of pkg_debian repository has been detected"
+else
+	info "clone pkg_debian repository"
+	git clone https://github.com/linuxdeepin/pkg_debian.git ${WORKBASE}/pkg_debian
+fi
