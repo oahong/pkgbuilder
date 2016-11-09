@@ -94,10 +94,10 @@ createSrcArchives() {
     if [[ -d ${repodir}/.git ]] ; then
         # set origin url
         git remote -v set-url origin ${repository}
+    else
+        # clone git repository
+        git clone -b ${work_branch} ${repository} ${repodir}
     fi
-
-    # clone git repository
-    git clone -b ${work_branch} ${repository} ${repodir}
 
     pushd ${repodir}
 
