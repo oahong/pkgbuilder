@@ -98,7 +98,11 @@ applyPatches() {
         debsrcFormatter
 
         for patch in $patchdir/*.patch; do
-            info "Import mips specific patch: $(basename $patch)"
+            if [[ -f debian/patches/$patch ]] ; then
+                warn "Ignore patch $patch, it has been applied"
+                continue
+            fi
+            info "Import patch: $(basename $patch)"
             dquilt import $patch
         done
     fi
