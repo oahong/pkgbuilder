@@ -5,6 +5,7 @@ declare -ar PBUILDEROPTS=(
     "--buildplace   ${WORKBASE}/deepin-chroot"
     "--hookdir      ${scriptdir}/pbuilder-hook.d"
     "--configfile   ${scriptdir}/pbuilderrc"
+    "--aptconfdir   ${scriptdir}/apt"
 )
 
 # buildresult must be specifed as pdebuild option
