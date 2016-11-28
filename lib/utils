@@ -98,8 +98,8 @@ applyPatches() {
         debsrcFormatter
 
         for patch in $patchdir/*.patch; do
-            if [[ -f debian/patches/$patch ]] ; then
-                warn "Ignore patch $patch, it has been applied"
+            if [[ -f debian/patches/${patch##*/} ]] ; then
+                warn "Ignore $patch, patch has been already applied"
                 continue
             fi
             info "Import patch: $(basename $patch)"
