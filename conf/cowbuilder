@@ -10,7 +10,7 @@ declare -ar PBUILDEROPTS=(
 
 # buildresult must be specifed as pdebuild option
 declare -r PBUILDEREXTRAOPTS=(
-    "--buildresult  ${WORKBASE}/${package}"
+    "--buildresult  ${WORKBASE}/artifacts"
 )
 
 declare -ar COWBUILDEROPTS=(

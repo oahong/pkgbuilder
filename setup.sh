@@ -37,7 +37,7 @@ info "create executable link"
 ln -sfv ${scriptdir}/cowimage /usr/local/bin
 ln -sfv ${scriptdir}/deepin-buildpkg /usr/local/bin
 
-mkdir -pv ${WORKBASE}
+mkdir -pv ${WORKBASE}/artifacts
 
 if [[ -d ${WORKBASE}/pkg_debian/.git ]] ; then
 	info "A copy of pkg_debian repository has been detected"
