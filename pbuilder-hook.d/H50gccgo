@@ -1,3 +1,17 @@
 #! /bin/bash
 
-update-alternatives --install /usr/bin/go go /usr/bin/go-5 100
+ARCH=$(dpkg-architecture -qDEB_HOST_ARCH)
+
+case ${ARCH} in
+    mipsel)
+        update-alternatives --install /usr/bin/go go /usr/bin/go-5 100
+        ;;
+    mips64el)
+        update-alternatives --remove-all gcc
+        update-alternatives --remove-all g++
+        update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5
+        update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 50 --slave /usr/bin/g++ g++ /usr/bin/g++-6
+        ;;
+esac
+
+exit 0
