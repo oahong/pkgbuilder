@@ -3,7 +3,7 @@
 declare -ar PBUILDEROPTS=(
     "--distribution ${DISTRIBUTIONS[$ARCH]}"
     "--buildplace   ${WORKBASE}/deepin-chroot"
-    "--hookdir      ${scriptdir}/pbuilder-hook.d"
+    "--hookdir      ${scriptdir}/hooks.d"
     "--configfile   ${scriptdir}/pbuilderrc"
     "--aptconfdir   ${scriptdir}/apt"
 )
