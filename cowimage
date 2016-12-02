@@ -11,7 +11,14 @@ MYPBOPTIONS=(
     ${COWBUILDEROPTS[@]}
 )
 
-case $1 in
+cmd=$1
+arch=$2
+
+MYPBOPTIONS+=(
+    "--basepath     ${WORKBASE}/base.cow-${arch}"
+)
+
+case $cmd in
     update)
 	sudo cowbuilder --update ${MYPBOPTIONS[@]}
 	;;
@@ -19,7 +26,7 @@ case $1 in
 	sudo cowbuilder --login --save ${MYPBOPTIONS[@]}
 	;;
     *)
-	echo "Usage: $0 update|login"
+	echo "Usage: $0 update|login [architecture]"
 	exit 1
 	;;
     *)
