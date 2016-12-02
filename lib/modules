@@ -13,7 +13,7 @@ ARCHITECTURE="${ARCH}"
 BINDMOUNT="$WORKBASE"
 ALLOWUNTRUSTED=yes
 DEBOOTSTRAPOPTS=( '--variant=buildd' '--no-check-gpg' )
-EXTRAPACKAGES="lintian gccgo-5 eatmydata"
+EXTRAPACKAGES="lintian gccgo-5 eatmydata gcc-5 g++-5"
 MIRRORSITE="${MIRRORSITE[${ARCH}]}"
 OTHERMIRROR="${OTHERMIRROR[${ARCH}]}"
 # pbuilder >= 0.225
