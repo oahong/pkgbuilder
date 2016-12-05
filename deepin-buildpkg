@@ -95,6 +95,10 @@ if [[ -n ${package} ]] ; then
     # set git repository for deepin components
     createdir $REPOBASE
 
+    if [[ -n ${DDE_COMPONENTS[$package]} ]]; then
+        repository=${BASEURI}/dde/${package}
+    fi
+
     case ${package} in
         lastore-daemon*)
             repository=${BASEURI}/lastore/${package}
@@ -107,9 +111,6 @@ if [[ -n ${package} ]] ; then
             ;;
     esac
 
-    if [[ -n ${DDE_COMPONENTS[$package]} ]]; then
-        repository=${BASEURI}/dde/${package}
-    fi
     #Create source package for deepin components
     createSrcArchives
 elif [[ -n ${dscurl} ]] ; then
