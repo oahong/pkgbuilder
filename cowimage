@@ -14,9 +14,11 @@ MYPBOPTIONS=(
 cmd=$1
 arch=$2
 
-MYPBOPTIONS+=(
-    "--basepath     ${WORKBASE}/base.cow-${arch}"
-)
+if [[ -n $arch ]] ; then
+    MYPBOPTIONS+=(
+        "--basepath     ${WORKBASE}/base.cow-${arch}"
+    )
+fi
 
 case $cmd in
     update)
