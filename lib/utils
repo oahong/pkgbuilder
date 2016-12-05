@@ -92,20 +92,25 @@ applyPatches() {
     pkgIsDebianized || \
         die "You should debianize your package, cwd: $PWD!!!"
 
-    local patchdir=${scriptdir}/patches/${package}
+    local patchdirs=(
+        ${scriptdir}/patches/${package}
+        ${scriptdir}/patches/${package}-${ARCH}
+    )
 
-    if hasPatch $patchdir ; then
-        debsrcFormatter
+    for patchdir in ${patchdirs} ; do
+        if hasPatch $patchdir ; then
+            debsrcFormatter
 
-        for patch in $patchdir/*.patch; do
-            if [[ -f debian/patches/${patch##*/} ]] ; then
-                warn "Ignore $patch, patch has been already applied"
-                continue
-            fi
-            info "Import patch: $(basename $patch)"
-            dquilt import $patch
-        done
-    fi
+            for patch in $patchdir/*.patch; do
+                if [[ -f debian/patches/${patch##*/} ]] ; then
+                    warn "Ignore $patch, patch has been already applied"
+                    continue
+                fi
+                info "Import patch: $(basename $patch)"
+                dquilt import $patch
+            done
+        fi
+    done
 }
 
 hasPbuilderChroot() {
