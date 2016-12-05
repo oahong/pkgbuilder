@@ -18,17 +18,18 @@ declare -ra DDE_COMPONENTS=(
 )
 
 declare -rA CHECKOUT_BRANCH=(
-    ['dbus-factory']=raccoon
-    ['dde-api']=raccoon
-    ['dde-control-center']=raccoon
-    ['dde-daemon']=raccoon
-    ['dde-desktop']=raccoon
-    ['dde-dock']=raccoon
-    ['dde-launcher']=raccoon
-    ['dde-session-ui']=raccoon
-    ['deepin-desktop-base']=raccoon
-    ['deepin-desktop-schemas']=raccoon
-    ['deepin-installer']=loongson
-    ['deepin-mutter']=release/3.20
-    ['startdde']=raccoon
+    [dbus-factory]=raccoon
+    [dde-api]=raccoon
+    [dde-control-center]=raccoon
+    [dde-daemon]=raccoon
+    [dde-desktop]=raccoon
+    [dde-dock]=raccoon
+    [dde-launcher]=raccoon
+    [dde-session-ui]=raccoon
+    [deepin-desktop-base]=raccoon
+    [deepin-desktop-schemas]=raccoon
+    [deepin-installer]=loongson
+    [deepin-mutter]=release/3.20
+    [startdde]=raccoon
+    [lastore-daemon]=raccoon
 )
