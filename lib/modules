@@ -176,8 +176,11 @@ buildPackage() {
     # Apply patches unless build official package (Not from any CL)
     [[ $CHANGELIST -eq 0 ]] && applyPatches
 
-    fixBuildDeps
-    fixDebuildOptions
+    # Special tweaks for architectures which has no native golang package
+    if [[ ${CGO_ARCHS[@]} =~ "${ARCH} " ]] ; then
+        fixBuildDeps
+        fixDebuildOptions
+    fi
 
     if [[ $do_build -eq 1 ]] ; then
         export DEBEMAIL="mips@deepin.com"

@@ -13,6 +13,10 @@ declare -ra ARCHITECTURES=(
     mipsel
     mips64el
 )
+# Architectures has no golang
+declare -ra CGO_ARCHS=(
+    mipsel
+)
 declare -rA DISTRIBUTIONS=(
     ['mipsel']='unstable'
     ['mips64el']='testing'
