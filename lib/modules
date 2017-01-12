@@ -6,8 +6,8 @@ configPbuilder() {
     # Should I use options instead of configuration?
     info "Initialize pbuilder configuration"
 
-    # Create config unless pbuilder chroot does not exist
-    hasPbuilderChroot || cat <<EOF > $pbuilderrc
+    # Always overwrite the configuration
+    cat <<EOF > $pbuilderrc
 AUTO_DEBSIGN=no
 ARCHITECTURE="${ARCH}"
 BINDMOUNT="$WORKBASE"
