@@ -1,5 +1,7 @@
 #! /bin/bash
 
+export PATH="/usr/sbin:$PATH"
+
 declare -Ar color=(
     ['reset']='\e[0m'
     ['error']='\e[1m\e[31m'
