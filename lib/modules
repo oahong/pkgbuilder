@@ -187,7 +187,7 @@ buildPackage() {
         export DEBFULLNAME="Deepin/MIPS Team"
 
         if [[ -n $dscurl ]] ; then
-            dch -i -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
+            dch -a -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
         else
             dch -v ${PKGVER} -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
         fi
