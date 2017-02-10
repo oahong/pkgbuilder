@@ -2,7 +2,7 @@
 
 declare -Ar MIRRORSITE=(
     [mipsel]='http://dserver.deepin.sh/mipsel'
-    [mips64el]='http://dserver.deepin.sh/mips64el'
+    [mips64el]='http://dserver.deepin.sh/mips64el-deepin'
 )
 
 declare -Ar OTHERMIRROR=(
