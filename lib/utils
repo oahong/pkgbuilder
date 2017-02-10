@@ -114,9 +114,15 @@ applyPatches() {
 }
 
 hasPbuilderChroot() {
-    if [[ -x ${WORKBASE}/base.cow-${ARCH}/bin/ls ]] ; then
+    local pbuilderroot=${WORKBASE}/base.cow-${ARCH}
+
+    if [[ -x ${pbuilderroot}/bin/ls ]] ; then
         return 0
     else
+	if [[ -d ${pbuilderroot} ]] ; then
+            warn "Incompleted pbuilder environment detected at ${pbuilderroot}"
+            die "You should manually remove ${pbuilderroot} and run the script again"
+	fi
         return 1
     fi
 }
