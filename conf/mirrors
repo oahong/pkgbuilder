@@ -11,5 +11,5 @@ declare -Ar OTHERMIRROR=(
 )
 
 declare -Ar UPSTREAMREPO=(
-    [mips64el]='http://dserver.deepin.sh/mips64el'
+    [mips64el]='http://dserver.deepin.sh/mips64el-debian'
 )
