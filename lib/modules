@@ -1,6 +1,5 @@
 #! /bin/bash
 
-
 configPbuilder() {
     local pbuilderrc=$1
     # Should I use options instead of configuration?
@@ -51,6 +50,37 @@ downloadGerritChange() {
     else
         die "Missing git-review in the system!!!"
     fi
+}
+
+# download debian src
+downloadDebianSrcFromUPstream() {
+    local pkgname=$1
+    local atpdir=${scriptdir}/apt
+    local apt_options="-o Dir::Etc::sourcelist=${aptdir}/sources.list-${ARCH} \
+	  -o Dir::Etc::SourceParts=/dev/null \
+	  -o Dir::Etc::Preferences=${aptdir}/preferences \
+	  -o Dir::State=${aptdir}/state \
+	  -o Dir::Cache=${aptdir}/cache \
+	  -o Acuqire::Retries=5 \
+	  -o APT::Architecture=${ARCH} \
+	  -o APT::Default-Release=${DISTRIBUTIONS[${ARCH}]}
+	  -o APT::Get::Assume-Yes \
+	  -o APT::Get::AllowUnauthenticated"
+
+    # create sources.list
+    cat <<EOF > ${aptdir}/sources.list-${ARCH}
+deb ${UPSTREAMREPO[$ARCH]} ${DISTRIBUTION[${ARCH}]} main contrib non-free
+deb-src ${UPSTREAMREPO[$ARCH]} ${DISTRIBUTION[${ARCH}]} main contrib non-free
+EOF
+    # update package index
+    apt-get ${apt_options} update
+    pkgname=$(apt-cache ${apt_options} showsrc $pkgname | awk '/^Package:/ {print $2}')
+    PKGVER=$(apt-cache ${apt_options} showsrc $pkgname | awk -F: '/^Version:/ {print $NF}')
+
+    createWorkdir
+    pushd ${workdir}
+    apt-get ${apt_options} source ${pkgname}
+    popd
 }
 
 downloadDebianSrc() {
