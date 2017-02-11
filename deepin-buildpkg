@@ -92,27 +92,7 @@ source ${scriptdir}/conf/cowbuilder
 [[ -z $changelog ]] && changelog="Rebuild on ${ARCH}"
 
 if [[ -n ${package} ]] ; then
-    # set git repository for deepin components
-    createdir $REPOBASE
-
-    if [[ -n ${DDE_COMPONENTS[$package]} ]]; then
-        repository=${BASEURI}/dde/${package}
-    fi
-
-    case ${package} in
-        lastore-daemon*)
-            repository=${BASEURI}/lastore/${package}
-            ;;
-        deepin-default-settings)
-            repository=${BASEURI}/${package##deepin-}
-            ;;
-        *)
-            repository=${BASEURI}/${package}
-            ;;
-    esac
-
-    #Create source package for deepin components
-    createSrcArchives
+    downloadDebianSrcFromUpstream
 elif [[ -n ${dscurl} ]] ; then
     downloadDebianSrc
 fi
