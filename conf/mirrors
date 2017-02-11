@@ -9,3 +9,7 @@ declare -Ar OTHERMIRROR=(
     [mipsel]='deb http://dserver.deepin.sh/mipsel-experimental raccoon main'
     [mips64el]=''
 )
+
+declare -Ar UPSTREAMREPO=(
+    [mips64el]='http://dserver.deepin.sh/mips64el'
+)
