@@ -53,33 +53,38 @@ downloadGerritChange() {
 }
 
 # download debian src
-downloadDebianSrcFromUPstream() {
-    local pkgname=$1
-    local atpdir=${scriptdir}/apt
+downloadDebianSrcFromUpstream() {
+    local aptdir=${scriptdir}/apt
     local apt_options="-o Dir::Etc::sourcelist=${aptdir}/sources.list-${ARCH} \
 	  -o Dir::Etc::SourceParts=/dev/null \
 	  -o Dir::Etc::Preferences=${aptdir}/preferences \
 	  -o Dir::State=${aptdir}/state \
 	  -o Dir::Cache=${aptdir}/cache \
+	  -o Debug::NoLocking=true \
 	  -o Acuqire::Retries=5 \
 	  -o APT::Architecture=${ARCH} \
 	  -o APT::Default-Release=${DISTRIBUTIONS[${ARCH}]}
-	  -o APT::Get::Assume-Yes \
-	  -o APT::Get::AllowUnauthenticated"
+	  -o APT::Get::Assume-Yes=true \
+	  -o APT::Get::AllowUnauthenticated=true"
+
+    mkdir -pv ${aptdir}/state/lists/partial
 
     # create sources.list
     cat <<EOF > ${aptdir}/sources.list-${ARCH}
-deb ${UPSTREAMREPO[$ARCH]} ${DISTRIBUTION[${ARCH}]} main contrib non-free
-deb-src ${UPSTREAMREPO[$ARCH]} ${DISTRIBUTION[${ARCH}]} main contrib non-free
+deb [lang=en] ${UPSTREAMREPO[$ARCH]} ${DISTRIBUTIONS[${ARCH}]} main contrib non-free
+deb-src [lang=en] ${UPSTREAMREPO[$ARCH]} ${DISTRIBUTIONS[${ARCH}]} main contrib non-free
 EOF
     # update package index
     apt-get ${apt_options} update
-    pkgname=$(apt-cache ${apt_options} showsrc $pkgname | awk '/^Package:/ {print $2}')
-    PKGVER=$(apt-cache ${apt_options} showsrc $pkgname | awk -F: '/^Version:/ {print $NF}')
 
+    # get the package name and package version
+    package=$(apt-cache ${apt_options} showsrc $package | awk '/^Package:/ {print $2}')
+    PKGVER=$(apt-cache ${apt_options} showsrc $package | awk -F: '/^Version:/ {gsub(/ /, "", $NF); print $NF}')
+
+    # download debian source code
     createWorkdir
     pushd ${workdir}
-    apt-get ${apt_options} source ${pkgname}
+    apt-get ${apt_options} source --download-only ${package}
     popd
 }
 
@@ -173,6 +178,8 @@ prepareBuild() {
 
     if [[ -n $dscurl ]] ; then
         dpkg-source -x ${workdir}/${dscurl} ${srcdir}
+    elif [[ -f ${workdir}/${package}_${PKGVER}.dsc ]] ; then
+        dpkg-source -x ${workdir}/${package}_${PKGVER}.dsc ${srcdir}
     else
         if [[ ! -f $srcpkg ]] ; then
             srcpkg=${srcpkg/.orig/}
@@ -216,11 +223,7 @@ buildPackage() {
         export DEBEMAIL="mips@deepin.com"
         export DEBFULLNAME="Deepin/MIPS Team"
 
-        if [[ -n $dscurl ]] ; then
-            dch -a -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
-        else
-            dch -v ${PKGVER} -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
-        fi
+        dch -a -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
 
         if [[ $usepbuilder -eq 1 ]] ; then
             export BOPTS=${BOPTS//-e}
