@@ -92,7 +92,23 @@ source ${scriptdir}/conf/cowbuilder
 [[ -z $changelog ]] && changelog="Rebuild on ${ARCH}"
 
 if [[ -n ${package} ]] ; then
-    downloadDebianSrcFromUpstream
+    if [[ ${DEEPIN_PACKAGES[@]} =~ " ${package} " ]] ; then
+	# it's a deepin package, so lets set up git repository
+	createdir $REPOBASE
+	repository=${BASEURI}/${package}
+	case ${package} in
+	    dde*|startdde|libdui)
+		repository=${BASEURI}/dde/${package}
+		;;
+	    deepin-appstore|init-data)
+		repository=${BASEURI}/dstore/${package}
+		;;
+	esac
+	createSrcArchives
+    else
+	# not a deepin package, download source package from upstream
+	downloadDebianSrcFromUpstream
+    fi
 elif [[ -n ${dscurl} ]] ; then
     downloadDebianSrc
 fi
@@ -101,6 +117,7 @@ printBuildInfo
 prepareBuild
 
 createPbuilderChroot
+# everything else beyond '--' in command line goes to buildPackage function
 buildPackage $@
 uploadArtifacts
 

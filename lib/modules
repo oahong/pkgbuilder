@@ -77,7 +77,7 @@ EOF
     # update package index
     apt-get ${apt_options} update
 
-    # get the package name and package version
+    # get package name and package version
     package=$(apt-cache ${apt_options} showsrc $package | awk '/^Package:/ {print $2}')
     PKGVER=$(apt-cache ${apt_options} showsrc $package | awk -F: '/^Version:/ {gsub(/ /, "", $NF); print $NF}')
 
@@ -221,9 +221,13 @@ buildPackage() {
 
     if [[ $do_build -eq 1 ]] ; then
         export DEBEMAIL="mips@deepin.com"
-        export DEBFULLNAME="Deepin/MIPS Team"
+        export DEBFULLNAME="deepin/MIPS team"
 
-        dch -a -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
+	if [[ ${DEEPIN_PACKAGES} =~ " ${package} " ]] ; then
+	    dch -v ${PKGVER} -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
+	else
+            dch -a -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
+	fi
 
         if [[ $usepbuilder -eq 1 ]] ; then
             export BOPTS=${BOPTS//-e}
