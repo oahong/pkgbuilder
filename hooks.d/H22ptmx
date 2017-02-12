@@ -1,0 +1,9 @@
+#! /bin/bash
+# Replace ptmx symlic with a real character device
+# This is a workaround with issue like debian #817236
+
+ptmx=/dev/ptmx
+if [[ -L $ptmx ]] ; then
+    rm $ptmx
+    mknod -m 666 $ptmx c 5 2
+fi
