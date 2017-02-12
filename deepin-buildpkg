@@ -82,7 +82,7 @@ while : ; do
     esac
 done
 
-contains $ARCH ${ARCHITECTURES[@]} || die "$ARCH is an unsupported architecture"
+contains ARCH ARCHITECTURES || die "$ARCH is an unsupported architecture"
 
 source ${scriptdir}/conf/cowbuilder
 
@@ -90,7 +90,7 @@ source ${scriptdir}/conf/cowbuilder
 [[ -z $changelog ]] && changelog="Rebuild on ${ARCH}"
 
 if [[ -n ${package} ]] ; then
-    if contains $package ${DEEPIN_PACKAGES[@]} ; then
+    if contains package DEEPIN_PACKAGES ; then
 	# it's a deepin package, so lets set up git repository
 	createdir $REPOBASE
 	repository=${BASEURI}/${package}

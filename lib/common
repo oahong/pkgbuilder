@@ -54,16 +54,13 @@ popd() {
     builtin popd $@ >& /dev/null
 }
 
+
+# http://stackoverflow.com/questions/3685970/check-if-an-array-contains-a-value
 contains() {
     local element=
-    local result=1
-    for element in ${@:2}; do
-        if [[ $element == $1 ]] ; then
-            result=0
-            break
-        fi
-    done
-    return $result
+    local array="$2[@]"
+    for element in ${!array}; do [[ $element == ${!1} ]] && return 0; done
+    return 1
 }
 
 createdir() {
