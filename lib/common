@@ -54,6 +54,18 @@ popd() {
     builtin popd $@ >& /dev/null
 }
 
+contains() {
+    local element=
+    local result=1
+    for element in ${@:2}; do
+        if [[ $element == $1 ]] ; then
+            result=0
+            break
+        fi
+    done
+    return $result
+}
+
 createdir() {
     local dir=$1
     local desc=$2
