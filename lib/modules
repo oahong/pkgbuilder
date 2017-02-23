@@ -81,8 +81,8 @@ EOF
 
     aptcache=$(apt-cache ${apt_options} showsrc $package)
     # get package name and package version
-    package=$(echo "${aptcache}" | awk '/^Package:/ {print $2}')
-    PKGVER=$(echo "${aptcache}" | awk -F: '/^Version:/ {gsub(/ /, "", $NF); print $NF}')
+    package=$(echo "${aptcache}" | awk '/^Package:/ {print $2; exit}')
+    PKGVER=$(echo "${aptcache}" | awk -F: '/^Version:/ {gsub(/ /, "", $NF); ver=$NF} END {print ver}')
 
     # download debian source code
     createWorkdir
