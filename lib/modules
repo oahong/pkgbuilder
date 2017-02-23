@@ -55,15 +55,15 @@ downloadGerritChange() {
 # download debian src
 downloadDebianSrcFromUpstream() {
     local aptdir=${scriptdir}/apt
-    local apt_options="-o Dir::Etc::sourcelist=${aptdir}/sources.list-${ARCH} \
+    local apt_options="-o Dir::Etc=${aptdir} \
+          -o Dir::Etc::sourcelist=sources.list-${ARCH} \
 	  -o Dir::Etc::SourceParts=/dev/null \
-	  -o Dir::Etc::Preferences=${aptdir}/preferences \
 	  -o Dir::State=${aptdir}/state \
 	  -o Dir::Cache=${aptdir}/cache \
 	  -o Debug::NoLocking=true \
 	  -o Acuqire::Retries=5 \
 	  -o APT::Architecture=${ARCH} \
-	  -o APT::Default-Release=${DISTRIBUTIONS[${ARCH}]}
+	  -o APT::Default-Release=${DISTRIBUTIONS[${ARCH}]} \
 	  -o APT::Get::Assume-Yes=true \
 	  -o APT::Get::AllowUnauthenticated=true"
 
