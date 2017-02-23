@@ -54,7 +54,9 @@ downloadGerritChange() {
 
 # download debian src
 downloadDebianSrcFromUpstream() {
+    local aptcache=
     local aptdir=${scriptdir}/apt
+
     local apt_options="-o Dir::Etc=${aptdir} \
           -o Dir::Etc::sourcelist=sources.list-${ARCH} \
 	  -o Dir::Etc::SourceParts=/dev/null \
@@ -77,9 +79,10 @@ EOF
     # update package index
     apt-get ${apt_options} update
 
+    aptcache=$(apt-cache ${apt_options} showsrc $package)
     # get package name and package version
-    package=$(apt-cache ${apt_options} showsrc $package | awk '/^Package:/ {print $2}')
-    PKGVER=$(apt-cache ${apt_options} showsrc $package | awk -F: '/^Version:/ {gsub(/ /, "", $NF); print $NF}')
+    package=$(echo "${aptcache}" | awk '/^Package:/ {print $2}')
+    PKGVER=$(echo "${aptcache}" | awk -F: '/^Version:/ {gsub(/ /, "", $NF); print $NF}')
 
     # download debian source code
     createWorkdir
