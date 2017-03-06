@@ -26,7 +26,7 @@ packages=(
 sudoers=examples/sudoers
 
 info "Install required packages"
-apt-get install ${packages[@]}
+apt-get install -y ${packages[@]}
 
 if [[ -f ${sudoers} ]] ; then
     info "Install sudoers configuration"
