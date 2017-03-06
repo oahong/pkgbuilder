@@ -18,6 +18,7 @@ packages=(
     eatmydata
     git
     git-review
+    git-buildpackage
     tmux
     quilt
     dput
