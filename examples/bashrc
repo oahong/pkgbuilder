@@ -1,0 +1,21 @@
+#! /bin/bash
+
+#########################
+# Append to your bashrc
+##
+
+# helper functions for the script
+dbpkg() {
+	packages=$*
+	for i in ${packages}; do
+		deepin-buildpkg -u kui -p -n $i
+		if [[ $? -ne 0 ]] ; then
+			echo "failed at $i ${packages##*$i}"
+			break
+		fi
+	done
+}
+
+# useful aliases
+alias bpkg='deepin-buildpkg -u kui -p'
+alias bpkg-updates='deepin-buildpkg -u kui-updates -p'
