@@ -7,7 +7,7 @@ declare -i CHANGELIST=
 declare BOPTS=
 declare PKGVER=
 declare ARCH=$(dpkg-architecture -qDEB_HOST_ARCH)
-declare DBPKGOPTS="-us -uc -sa -j auto"
+declare DBPKGOPTS="-us -uc -sa -jauto"
 
 declare -ra ARCHITECTURES=(
     mipsel
