@@ -223,9 +223,6 @@ buildPackage() {
     fi
 
     if [[ $do_build -eq 1 ]] ; then
-        export DEBEMAIL="mips@deepin.com"
-        export DEBFULLNAME="deepin/MIPS team"
-
 	if [[ ${DEEPIN_PACKAGES} =~ " ${package} " ]] ; then
 	    dch -v ${PKGVER} -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
 	else

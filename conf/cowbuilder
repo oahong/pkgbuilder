@@ -1,5 +1,9 @@
 # cowbuilder has not basetgz
 #    "--basetgz      ${WORKBASE}/deepin-base.tgz"
+
+declare -r DEBEMAIL="mips@deepin.com"
+declare -r DEBFULLNAME="deepin/MIPS team"
+
 declare -ar PBUILDEROPTS=(
     "--distribution ${DISTRIBUTIONS[$ARCH]}"
     "--buildplace   ${WORKBASE}/deepin-chroot"
