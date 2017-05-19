@@ -38,6 +38,9 @@ info "create executable link"
 ln -sfv ${scriptdir}/cowimage /usr/local/bin
 ln -sfv ${scriptdir}/deepin-buildpkg /usr/local/bin
 
+info "copy apt key"
+cp -av /etc/apt/trusted.gpg.d/ ${scriptdir}/apt
+
 mkdir -pv ${WORKBASE}/artifacts
 
 if [[ -d ${WORKBASE}/pkg_debian/.git ]] ; then
