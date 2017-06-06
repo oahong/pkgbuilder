@@ -222,9 +222,6 @@ buildPackage() {
         fixDebuildOptions
     fi
 
-    info "Checking build dependencies:"
-    dpkg-checkbuilddeps -a ${ARCH} debian/control
-
     if [[ $do_build -eq 1 ]] ; then
 	if [[ ${DEEPIN_PACKAGES} =~ " ${package} " ]] ; then
 	    dch -v ${PKGVER} -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
