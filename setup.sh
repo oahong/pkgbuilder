@@ -3,12 +3,15 @@
 set -e
 
 declare -r scriptdir=$(dirname $(readlink -ef $0))
+declare -r username=$(logname)
 
 source conf/env
 source lib/common
 
-if [[ EUID -ne 0 ]] ; then
+if [[ $EUID -ne 0 ]] ; then
     die "Root privilege is required to run setup script"
+elif [[ $username == root ]] ; then
+    die "You should run the setup script via sudo as a normal user"
 fi
 
 packages=(
@@ -32,6 +35,7 @@ apt-get install -y ${packages[@]}
 if [[ -f ${sudoers} ]] ; then
     info "Install sudoers configuration"
     install -m 600 -v $sudoers /etc/sudoers.d/deepin_pbuilder
+    sed -e "s/deepin/$username/" -i /etc/sudoers.d/deepin_pbuilder
 fi
 
 info "create executable link"
