@@ -87,7 +87,7 @@ contains ARCH ARCHITECTURES || die "$ARCH is an unsupported architecture"
 source ${scriptdir}/conf/cowbuilder
 
 # set default changelog
-[[ -z $changelog ]] && changelog="Rebuild on ${ARCH}"
+[[ -z $changelog ]] && changelog="Rebuild on ${ARCH} via build script ${0##*/}"
 
 if [[ -n ${package} ]] ; then
     if contains package DEEPIN_PACKAGES ; then
