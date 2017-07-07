@@ -1,15 +1,15 @@
 #! /bin/bash
 
 declare -Ar MIRRORSITE=(
-    [mipsel]='http://dserver.deepin.sh/mipsel'
-    [mips64el]='http://dserver.deepin.sh/mips64el-deepin'
+    [mipsel]='http://s135.sh.deepin.cn/mipsel'
+    [mips64el]='http://s135.sh.deepin.cn/mips64el-deepin'
 )
 
 declare -Ar OTHERMIRROR=(
-    [mipsel]='deb http://dserver.deepin.sh/mipsel-experimental raccoon main'
+    [mipsel]='deb http://s135.sh.deepin.cn/mipsel-experimental raccoon main'
     [mips64el]=''
 )
 
 declare -Ar UPSTREAMREPO=(
-    [mips64el]='http://dserver.deepin.sh/mips64el-debian'
+    [mips64el]='http://s135.sh.deepin.cn/mips64el-debian'
 )
