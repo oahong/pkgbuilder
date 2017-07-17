@@ -208,20 +208,26 @@ createPbuilderChroot() {
 }
 
 fixArch() {
-    local autotools_files=(
+    [[ ${ARCH} != 'sw_64' ]] || return
+
+    # source code from autotools_files
+    local src=(
         /usr/share/misc/config.guess
         /usr/share/misc/config.sub
     )
 
-    if [[ ${ARCH} == 'sw_64' ]] ; then
-        if [[ -f config.guess && -f config.sub ]] ; then
-            for src in ${autotools_files[@]}; do
-                local dest=${src##*/}
-                info "Replace architecture detection code in ${dest}"
-                cp ${src} ${dest} -v
-            done
-        fi
+    local dest=(
+        $(find /build/dpkg/dpkg-1.18.24/ -name config.guess -or -name config.sub)
+    )
+
+    if [[ ${#dest[@]} -ne 2 ]] ; then
+        die "I'm confused, multiple config.guess or config.sub have been found"
     fi
+
+    for idx in ${!autotools_files[@]}; do
+        info "Replace architecture detection code in ${dest[$idx]}"
+        cp -v ${src[$idx]} ${dest[$idx]}
+    done
 }
 
 buildPackage() {
