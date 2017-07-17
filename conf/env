@@ -22,6 +22,7 @@ declare -ra CGO_ARCHS=(
 declare -rA DISTRIBUTIONS=(
     ['mipsel']='unstable'
     ['mips64el']='stable'
+    ['sw_64']='stable'
 )
 
 declare -r WORKBASE=${scriptdir%/*}
