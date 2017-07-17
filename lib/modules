@@ -225,8 +225,12 @@ fixArch() {
     fi
 
     for idx in ${!autotools_files[@]}; do
-        info "Replace architecture detection code in ${dest[$idx]}"
-        cp -v ${src[$idx]} ${dest[$idx]}
+        if grep -wqs config-patches@gnu.org ; then
+            info "Replace architecture detection code in ${dest[$idx]}"
+            cp -v ${src[$idx]} ${dest[$idx]}
+        else
+            info "${dest[$idx]} not recognized"
+        fi
     done
 }
 
