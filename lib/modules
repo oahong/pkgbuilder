@@ -33,7 +33,6 @@ initializePbuilder() {
          ${COWBUILDEROPTS[@]}
 }
 
-
 configGitReview() {
     echo "create per project gitreview configuration"
     if [[ ! -f .gitreview ]] ; then
@@ -208,6 +207,23 @@ createPbuilderChroot() {
     fi
 }
 
+fixArch() {
+    local autotools_files=(
+        /usr/share/misc/config.guess
+        /usr/share/misc/config.sub
+    )
+
+    if [[ ${ARCH} == 'sw_64' ]] ; then
+        if [[ -f config.guess && -f config.sub ]] ; then
+            for src in ${autotools_files[@]}; do
+                local dest=${src##*/}
+                info "Replace architecture detection code in ${dest}"
+                cp ${src} ${dest} -v
+            done
+        fi
+    fi
+}
+
 buildPackage() {
     # override default dpkg-buildpackage options
     DBPKGOPTS+=" $@"
@@ -222,12 +238,14 @@ buildPackage() {
         fixDebuildOptions
     fi
 
+    fixArch
+
     if [[ $do_build -eq 1 ]] ; then
-	if [[ ${DEEPIN_PACKAGES} =~ " ${package} " ]] ; then
-	    dch -v ${PKGVER} -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
-	else
+        if [[ ${DEEPIN_PACKAGES} =~ " ${package} " ]] ; then
+	        dch -v ${PKGVER} -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
+        else
             dch -a -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
-	fi
+        fi
 
         if [[ $usepbuilder -eq 1 ]] ; then
             export BOPTS=${BOPTS//-e}
