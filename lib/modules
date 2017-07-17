@@ -264,6 +264,9 @@ buildPackage() {
                 ${PBUILDEROPTS[@]}              \
                 ${COWBUILDEROPTS[@]}
         else
+            info "Checking build dependencies:"
+            dpkg-checkbuilddeps -a ${ARCH} debian/control
+
             info "Debuild options: ${BOPTS} ${DBPKGOPTS}"
             eval debuild ${BOPTS} ${DBPKGOPTS}
         fi
