@@ -210,22 +210,22 @@ createPbuilderChroot() {
 fixArch() {
     [[ ${ARCH} == 'sw_64' ]] || return 0
 
-    # source code from autotools_files
+    # helper scripts from autoconf
     local src=(
         /usr/share/misc/config.guess
         /usr/share/misc/config.sub
     )
 
     local dest=(
-        $(find /build/dpkg/dpkg-1.18.24/ -name config.guess -or -name config.sub)
+        $(find . -name config.guess -or -name config.sub)
     )
 
     if [[ ${#dest[@]} -ne 2 ]] ; then
         die "I'm confused, multiple config.guess or config.sub have been found"
     fi
 
-    for idx in ${!autotools_files[@]}; do
-        if grep -wqs config-patches@gnu.org ; then
+    for idx in ${!src[@]}; do
+        if grep -wqs config-patches@gnu.org ${src[$idx]}; then
             info "Replace architecture detection code in ${dest[$idx]}"
             cp -v ${src[$idx]} ${dest[$idx]}
         else
