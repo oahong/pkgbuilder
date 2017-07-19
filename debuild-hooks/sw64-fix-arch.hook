@@ -1,0 +1,19 @@
+#! /bin/bash
+
+# helper scripts from autoconf
+dest=(
+    $(find . -name config.guess -or -name config.sub)
+)
+
+if [[ ${#dest[@]} -ne 2 ]] ; then
+    echo "I'm confused, multiple config.guess or config.sub have been found"
+fi
+
+for idx in ${!dest[@]}; do
+    if grep -wqs config-patches@gnu.org ${dest[$idx]}; then
+        echo "Replace architecture detection code in autotool helper script ${dest[$idx]}"
+        cp -v /usr/share/misc/${dest[$idx]##*/} ${dest[$idx]}
+    else
+        echo "skip ${dest[$idx]}"
+    fi
+done

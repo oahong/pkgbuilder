@@ -207,33 +207,6 @@ createPbuilderChroot() {
     fi
 }
 
-fixArch() {
-    [[ ${ARCH} == 'sw_64' ]] || return 0
-
-    # helper scripts from autoconf
-    local src=(
-        /usr/share/misc/config.guess
-        /usr/share/misc/config.sub
-    )
-
-    local dest=(
-        $(find . -name config.guess -or -name config.sub)
-    )
-
-    if [[ ${#dest[@]} -ne 2 ]] ; then
-        die "I'm confused, multiple config.guess or config.sub have been found"
-    fi
-
-    for idx in ${!src[@]}; do
-        if grep -wqs config-patches@gnu.org ${src[$idx]}; then
-            info "Replace architecture detection code in ${dest[$idx]}"
-            cp -v ${src[$idx]} ${dest[$idx]}
-        else
-            info "${dest[$idx]} not recognized"
-        fi
-    done
-}
-
 buildPackage() {
     # override default dpkg-buildpackage options
     DBPKGOPTS+=" $@"
@@ -247,8 +220,6 @@ buildPackage() {
         fixBuildDeps
         fixDebuildOptions
     fi
-
-    fixArch
 
     if [[ $do_build -eq 1 ]] ; then
         if [[ ${DEEPIN_PACKAGES} =~ " ${package} " ]] ; then
@@ -274,6 +245,11 @@ buildPackage() {
                 ${PBUILDEROPTS[@]}              \
                 ${COWBUILDEROPTS[@]}
         else
+            if [[ ${ARCH} == 'sw_64' ]] ; then
+                local debuild_hook=sw64-fix-arch.hook
+                warn "Add debuild hook ${debuild_hook}"
+                BOPT+=" dpkg-build-hook=${scriptdir}/debuild-hooks/${debuild_hook}"
+            fi
             info "Checking build dependencies:"
             dpkg-checkbuilddeps -a ${ARCH} debian/control && \
                 info "Build dependencies satisfied" || \
