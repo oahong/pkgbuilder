@@ -5,8 +5,8 @@ dest=(
     $(find . -name config.guess -or -name config.sub)
 )
 
-if [[ ${#dest[@]} -ne 2 ]] ; then
-    echo "I'm confused, multiple config.guess or config.sub have been found"
+if [[ ${#dest[@]} -gt 2 ]] ; then
+    echo "Multiple copies of config.guess a/ config.sub have been found"
 fi
 
 for idx in ${!dest[@]}; do
