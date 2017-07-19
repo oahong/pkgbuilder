@@ -19,9 +19,9 @@ done
 [[ $EUID -eq 0 ]] && warn "You should build package with an unpriviledged user"
 
 OPTS=$(getopt -n $0 \
-        -o 'a:c:d:l:n:t:u:bhp' \
-        --long arch:,cl:,dsc:,changelog:,package:,target-branch:,upload:,build,help,pbuilder \
-        -- "$@")
+              -o 'a:c:d:l:n:t:u:bhp' \
+              --long arch:,cl:,dsc:,changelog:,package:,target-branch:,upload:,build,help,pbuilder \
+              -- "$@")
 
 [[ $? -eq 0 ]] || die "Sorry! I don't understand!!!"
 
@@ -91,21 +91,21 @@ source ${scriptdir}/conf/cowbuilder
 
 if [[ -n ${package} ]] ; then
     if contains package DEEPIN_PACKAGES ; then
-	# it's a deepin package, so lets set up git repository
-	createdir $REPOBASE
-	repository=${BASEURI}/${package}
-	case ${package} in
-	    dde*|startdde|libdui)
-		repository=${BASEURI}/dde/${package}
-		;;
-	    deepin-appstore|init-data)
-		repository=${BASEURI}/dstore/${package}
-		;;
-	esac
-	createSrcArchives
+	    # it's a deepin package, so lets set up git repository
+	    createdir $REPOBASE
+	    repository=${BASEURI}/${package}
+	    case ${package} in
+	        dde*|startdde|libdui)
+		        repository=${BASEURI}/dde/${package}
+		        ;;
+	        deepin-appstore|init-data)
+	            repository=${BASEURI}/dstore/${package}
+		        ;;
+	    esac
+	    createSrcArchives
     else
-	# not a deepin package, download source package from upstream
-	downloadDebianSrcFromUpstream
+	    # not a deepin package, download source package from upstream
+	    downloadDebianSrcFromUpstream
     fi
 elif [[ -n ${dscurl} ]] ; then
     downloadDebianSrc
