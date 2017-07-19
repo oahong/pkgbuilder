@@ -39,16 +39,16 @@ downloadDebianSrcFromUpstream() {
     local aptdir=${scriptdir}/apt
 
     local apt_options="-o Dir::Etc=${aptdir} \
-          -o Dir::Etc::sourcelist=sources.list-${ARCH} \
-	  -o Dir::Etc::SourceParts=/dev/null \
-	  -o Dir::State=${aptdir}/state \
-	  -o Dir::Cache=${aptdir}/cache \
-	  -o Debug::NoLocking=true \
-	  -o Acuqire::Retries=5 \
-	  -o APT::Architecture=${ARCH} \
-	  -o APT::Default-Release=${DISTRIBUTIONS[${ARCH}]} \
-	  -o APT::Get::Assume-Yes=true \
-	  -o APT::Get::AllowUnauthenticated=true"
+        -o Dir::Etc::sourcelist=sources.list-${ARCH} \
+	    -o Dir::Etc::SourceParts=/dev/null \
+	    -o Dir::State=${aptdir}/state \
+	    -o Dir::Cache=${aptdir}/cache \
+	    -o Debug::NoLocking=true \
+	    -o Acuqire::Retries=5 \
+	    -o APT::Architecture=${ARCH} \
+	    -o APT::Default-Release=${DISTRIBUTIONS[${ARCH}]} \
+	    -o APT::Get::Assume-Yes=true \
+	    -o APT::Get::AllowUnauthenticated=true"
 
     mkdir -pv ${aptdir}/state/lists/partial
 
@@ -147,12 +147,12 @@ buildPackage() {
 
         if [[ $usepbuilder -eq 1 ]] ; then
             eval pdebuild --pbuilder cowbuilder \
-                --use-pdebuild-internal         \
-                --debbuildopts '"${DBPKGOPTS}"' \
-                ${PBUILDEREXTRAOPTS[@]}         \
-                --                              \
-                ${PBUILDEROPTS[@]}              \
-                ${COWBUILDEROPTS[@]}
+                 --use-pdebuild-internal         \
+                 --debbuildopts '"${DBPKGOPTS}"' \
+                 ${PBUILDEREXTRAOPTS[@]}         \
+                 --                              \
+                 ${PBUILDEROPTS[@]}              \
+                 ${COWBUILDEROPTS[@]}
         else
             if [[ ${ARCH} == 'sw_64' ]] ; then
                 local debuild_hook=sw64-fix-arch.hook
@@ -162,7 +162,7 @@ buildPackage() {
             info "Checking build dependencies:"
             dpkg-checkbuilddeps -a ${ARCH} debian/control && \
                 info "Build dependencies satisfied" || \
-                return
+                    return
 
             info "Debuild options: ${BOPTS} ${DBPKGOPTS}"
             eval debuild ${BOPTS} ${DBPKGOPTS}
