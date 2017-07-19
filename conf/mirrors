@@ -2,15 +2,8 @@
 
 declare -r BASEMIRROR=http://s135.sh.deepin.cn
 declare -Ar MIRRORSITE=(
-    [mipsel]="${BASEMIRROR}/mipsel"
     [mips64el]="${BASEMIRROR}/mips64el-deepin"
     [sw_64]="${BASEMIRROR}/raise3.2"
-)
-
-declare -Ar OTHERMIRROR=(
-    [mipsel]="deb ${BASEMIRROR}/mipsel-experimental raccoon main"
-    [mips64el]=""
-    [sw_64]=""
 )
 
 declare -Ar UPSTREAMREPO=(
