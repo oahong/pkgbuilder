@@ -126,8 +126,6 @@ cat <<EOF
 We're building on architecture $ARCH:
     package:        $package
     changelog:      $changelog
-    CL:             $CHANGELIST
-    repository:     $repository
     dsc:            $dscurl
     builder:        $builder
 EOF
