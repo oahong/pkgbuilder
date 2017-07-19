@@ -33,24 +33,6 @@ initializePbuilder() {
          ${COWBUILDEROPTS[@]}
 }
 
-configGitReview() {
-    echo "create per project gitreview configuration"
-    if [[ ! -f .gitreview ]] ; then
-        cat <<EOF > .gitreview
-[gerrit]
-defaultremote = origin
-EOF
-    fi
-}
-
-downloadGerritChange() {
-    if hasBin git-review ; then
-        git review -d $1
-    else
-        die "Missing git-review in the system!!!"
-    fi
-}
-
 # download debian src
 downloadDebianSrcFromUpstream() {
     local aptcache=
@@ -113,65 +95,6 @@ downloadDebianSrc() {
     dscurl=$dscfile
 }
 
-createSrcArchives() {
-    createWorkdir
-
-    local work_branch=${CHECKOUT_BRANCH[${package}]:-master}
-    local repodir=${REPOBASE}/${package}
-
-    info "Current branch is $work_branch"
-
-    if [[ -n $targetbranch ]] ; then
-        work_branch=$targetbranch
-        warn "Set branch to $targetbranch, according to command line options"
-    fi
-
-    hasBin git || die "Missing git in the system!!!"
-
-    if [[ -d ${repodir}/.git ]] ; then
-        # set origin url
-        pushd ${repodir}
-        git remote -v set-url origin ${repository}
-        popd
-    else
-        # clone git repository
-        git clone -b ${work_branch} ${repository} ${repodir}
-    fi
-
-    pushd ${repodir}
-
-    # in case we need to switch branches
-    git checkout -B ${work_branch} --track origin/${work_branch}
-    git pull origin ${work_branch}
-
-    local commit_id=$(git rev-parse HEAD | cut -b 1-6)
-    assert commit_id
-    local tag=$(git describe --tags --abbrev=0)
-    local revision=$(git log ${tag}..origin/${work_branch} --oneline | wc -l)
-    assert revision
-
-    if [[ -z ${tag} ]] ;then
-        info "tag fallback to 0.1"
-        tag=0.1
-    fi
-    assert tag
-
-    # gerrit CL workflow
-    if [[ ${CHANGELIST} -gt 1 ]] ; then
-        configGitReview
-        downloadGerritChange $CHANGELIST
-        PKGVER=$tag+cl~$CHANGELIST
-    else
-        PKGVER=$tag+r${revision}~${commit_id}
-    fi
-
-    info "Create ${package} upstream source tarball..."
-    git archive --format=tar --prefix=${package}-${PKGVER}/ HEAD | \
-        xz -z > ${workdir}/${package}_${PKGVER}.orig.tar.xz
-
-    popd
-}
-
 prepareBuild() {
     local srcdir=${workdir}/${package}-${PKGVER}
     local srcpkg=${workdir}/${package}_${PKGVER}.orig.tar.xz
@@ -215,12 +138,6 @@ buildPackage() {
     # Apply patches unless build official package (Not from any CL)
     [[ $CHANGELIST -eq 0 ]] && applyPatches
 
-    # Special tweaks for architectures which has no native golang package
-    if [[ ${CGO_ARCHS[@]} =~ "${ARCH} " ]] ; then
-        fixBuildDeps
-        fixDebuildOptions
-    fi
-
     if [[ $do_build -eq 1 ]] ; then
         if [[ ${DEEPIN_PACKAGES} =~ " ${package} " ]] ; then
 	        dch -v ${PKGVER} -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
@@ -229,14 +146,6 @@ buildPackage() {
         fi
 
         if [[ $usepbuilder -eq 1 ]] ; then
-            export BOPTS=${BOPTS//-e}
-            warn "Set BOPTS to ${BOPTS:-NULL}"
-
-            if [[ ${ARCH} == mipsel ]] ; then
-                warn "${ARCH} Set environment to make package build against gccgo"
-                export USE_CGO=1 CGO_ENABLED=1
-            fi
-
             eval pdebuild --pbuilder cowbuilder \
                 --use-pdebuild-internal         \
                 --debbuildopts '"${DBPKGOPTS}"' \

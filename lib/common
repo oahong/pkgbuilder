@@ -75,7 +75,7 @@ createdir() {
 printHelp() {
     cat <<EOF >&2
 Usage:
-  $0 -n PACKAGE|-d DSC [-a ARCH] [-c NUMBER] [-l CHANGELOG] [-t BRANCH] [-u HOST] [-w WORKDIR] [-b|-p] [-h]
+  $0 -n PACKAGE|-d DSC [-a ARCH] [-l CHANGELOG] [-u HOST] [-w WORKDIR] [-b|-p] [-h]
 
 Package builder for deepin mips team, version $SVERSION
 
@@ -83,12 +83,10 @@ Help Options:
   -h, --help            Show help options
 Application Options:
   -a, --arch=ARCH              Build package for ARCH architecture
-  -c, --cl=NUMBER              Build package based on a CL: NUMBER
   -d, --dsc=DSC                Build package according to a DSC, DSC should be
                                a local path or url to Debian src control file
   -l, --changelog=CHANGELOG    Use CHANGELOG as debian package changelog
   -n, --package=PACKAGE        Build PACKAGE
-  -t, --target-branch=BRANCH   Check out to specific BRANCH
   -u, --upload=HOST            Upload build artifacts to HOST, you should
                                define HOST in dput config
   -b, --build                  Perform a package build using debuild
@@ -100,8 +98,6 @@ $0 will not issue any build command (pdebuild or debuild) unless -p or -b option
 
 Examples:
   $0 -n dde-desktop                            Prepare for building dde-destop
-  $0 -n dde-desktop -c 64380 -p                Build dde-desktop with gerrit change 64380
-                                               in a pbuilder chroot
   $0 -n dde-desktop -b                         Build dde-desktop from scratch
   $0 -n dde-desktop -b -u staging              Build dde-desktop then upload to staging
   $0 -n dde-api -p -l "Rebuild for testing"    Build dde-api in a clean pbuilder chroot

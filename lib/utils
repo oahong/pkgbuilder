@@ -66,28 +66,6 @@ debsrcFormatter() {
     fi
 }
 
-fixBuildDeps() {
-    info "Replace golang-go in build deps with gccgo-5"
-    if pkgIsDebianized ; then
-        sed -e 's@golang-go\s*,@gccgo-5 | &@g' -i debian/control
-    fi
-}
-
-fixDebuildOptions() {
-    if pkgIsDebianized ; then
-        if grep -wqs golang-go debian/control ; then
-            warn "Golang package detected, trying to fix debuild option"
-            BOPTS+="-e USE_GGCGO=1 -e CGO_ENABLED=1 "
-        fi
-    fi
-
-    [[ $package == deepin-file-manager-backend ]] && \
-        BOPTS+="-e CGO_LDTHREAD=-lpthread"
-
-    # package test maybe fail, force return true
-    return 0
-}
-
 applyPatches() {
     pkgIsDebianized || \
         die "You should debianize your package, cwd: $PWD!!!"
