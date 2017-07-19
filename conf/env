@@ -1,6 +1,6 @@
 #! /bin/bash
 
-declare -r SVERSION="v0.3.0"
+declare -r SVERSION="v0.4.0"
 
 declare BOPTS=
 declare PKGVER=
