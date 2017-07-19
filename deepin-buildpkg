@@ -81,9 +81,11 @@ contains ARCH ARCHITECTURES || die "$ARCH is an unsupported architecture"
 source ${scriptdir}/conf/cowbuilder
 
 if [[ -n ${package} ]] ; then
-	downloadDebianSrcFromUpstream
+    downloadDebianSrcFromUpstream
 elif [[ -n ${dscurl} ]] ; then
     downloadDebianSrc
+else
+    die "'-n' or '-d' is mandatory option"
 fi
 
 printBuildInfo
