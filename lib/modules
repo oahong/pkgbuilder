@@ -208,7 +208,7 @@ createPbuilderChroot() {
 }
 
 fixArch() {
-    [[ ${ARCH} != 'sw_64' ]] || return 0
+    [[ ${ARCH} == 'sw_64' ]] || return 0
 
     # source code from autotools_files
     local src=(
