@@ -1,5 +1,0 @@
---- /dev/null
-+++ b/overrides/mips/org.gnome.gnome-screenshot.override
-@@ -0,0 +1,2 @@
-+[org.gnome.gnome-screenshot]
-+auto-save-directory='~/桌面'
