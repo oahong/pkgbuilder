@@ -4,7 +4,7 @@ declare -r DEBFULLNAME=${DEBFULLNAME:-deepin/MIPS team}
 declare -ar PBUILDEROPTS=(
     "--distribution ${DISTRIBUTIONS[${ARCH}]}"
     "--buildplace   ${WORKBASE}/deepin-chroot"
-    "--hookdir      ${scriptdir}/hooks.d"
+    "--hookdir      ${scriptdir}/hooks.d/pbuilder"
     "--configfile   ${scriptdir}/pbuilderrc"
     "--aptconfdir   ${scriptdir}/apt"
 )
