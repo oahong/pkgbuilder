@@ -134,9 +134,6 @@ buildPackage() {
     DBPKGOPTS+=" $@"
     pushd ${workdir}/${package}-${PKGVER}
 
-    # Apply patches unless build official package (Not from any CL)
-    [[ $CHANGELIST -eq 0 ]] && applyPatches
-
     if [[ $do_build -eq 1 ]] ; then
         if [[ ${DEEPIN_PACKAGES} =~ " ${package} " ]] ; then
 	        dch -v ${PKGVER} -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"

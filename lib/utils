@@ -41,56 +41,6 @@ EOF
     quilt --quiltrc=${quiltrc} -f $@
 }
 
-debsrcFormatter() {
-    local sformat=
-    local sformatfile=debian/source/format
-    local quilt="3.0 (quilt)"
-
-    if [[ -f $sformatfile ]] ; then
-        sformat=$(cat $sformatfile)
-    fi
-
-    if [[ $sformat =~ 3.0[[:space:]]\((native|quilt)\) ]] ; then
-        info "${package} has debsrc 3.0 format: $sformat"
-    fi
-
-    if hasPatch; then
-        info "Found patches, set package source format to debsrc 3.0 quilt"
-        sformat=$quilt
-        createdir ${sformatfile//format}; echo $sformat > ${sformatfile}
-    fi
-
-    if [[ $sformat == $quilt ]] ; then
-        PKGVER="${PKGVER}-1"
-        info "set PKGVER to ${PKGVER}"
-    fi
-}
-
-applyPatches() {
-    pkgIsDebianized || \
-        die "You should debianize your package, cwd: $PWD!!!"
-
-    local patchdirs=(
-        ${scriptdir}/patches/${package}
-        ${scriptdir}/patches/${package}-${ARCH}
-    )
-
-    for patchdir in ${patchdirs} ; do
-        if hasPatch $patchdir ; then
-            debsrcFormatter
-
-            for patch in $patchdir/*.patch; do
-                if [[ -f debian/patches/${patch##*/} ]] ; then
-                    warn "Ignore $patch, patch has been already applied"
-                    continue
-                fi
-                info "Import patch: $(basename $patch)"
-                dquilt import $patch
-            done
-        fi
-    done
-}
-
 hasPbuilderChroot() {
     local pbuilderroot=${WORKBASE}/base.cow-${ARCH}
 
