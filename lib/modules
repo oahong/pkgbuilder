@@ -96,7 +96,6 @@ downloadDebianSrc() {
 
 prepareBuild() {
     local srcdir=${workdir}/${package}-${PKGVER}
-    local srcpkg=${workdir}/${package}_${PKGVER}.orig.tar.xz
 
     rm -rf $srcdir
 
@@ -105,18 +104,7 @@ prepareBuild() {
     elif [[ -f ${workdir}/${package}_${PKGVER}.dsc ]] ; then
         dpkg-source -x ${workdir}/${package}_${PKGVER}.dsc ${srcdir}
     else
-        if [[ ! -f $srcpkg ]] ; then
-            srcpkg=${srcpkg/.orig/}
-            [[ -f $srcpkg ]] || die "src package $srcpkg not found"
-        fi
-
-        tar xf ${srcpkg} -C ${workdir}
-
-        pushd ${srcdir}
-        if ! pkgIsDebianized ; then
-            cp -a ${WORKBASE}/pkg_debian/${package}/debian .
-        fi
-        popd
+        die "Not able to read debian source control file"
     fi
 }
 
