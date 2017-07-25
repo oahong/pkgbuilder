@@ -1,21 +1,5 @@
 #! /bin/bash
 
-hasPatch() {
-    if [[ -d $patchdir ]] ; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-pkgIsDebianized() {
-    if [[ -d debian ]] ; then
-        return 0
-    else
-        return 1
-    fi
-}
-
 dquilt() {
     local quiltrc=${HOME}/.quiltrc-dpkg
 
