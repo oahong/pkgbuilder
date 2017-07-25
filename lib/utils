@@ -73,11 +73,12 @@ printBuildInfo() {
 
     info "Build script version: $SVERSION"
 cat <<EOF
-We're building on architecture $ARCH:
-    package:        $package
-    changelog:      $changelog
-    dsc:            $dscurl
-    builder:        $builder
+We're building on architecture ${ARCH}:
+    package:        ${package}
+    changelog:      ${changelog}
+    dsc:            ${dscurl}
+    builder:        ${builder}
+    maintianer:     ${DEBFULLNAME}
 EOF
 }
 
