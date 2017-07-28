@@ -5,7 +5,7 @@ declare -r SVERSION="v0.4.0"
 declare BOPTS=
 declare PKGVER=
 declare ARCH=$(dpkg-architecture -qDEB_HOST_ARCH)
-declare DBPKGOPTS="-us -uc -sa -jauto"
+declare DBPKGOPTS="-d -us -uc -sa -jauto"
 
 declare -ra ARCHITECTURES=(
     mips64el
