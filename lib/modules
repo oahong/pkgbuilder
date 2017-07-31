@@ -49,7 +49,7 @@ downloadDebianSrcFromUpstream() {
 	    -o APT::Get::Assume-Yes=true \
 	    -o APT::Get::AllowUnauthenticated=true"
 
-    install -d -m 655 ${aptdir}/state/lists/partial
+    mkdir -pv ${aptdir}/state/lists/partial
 
     # create sources.list
     cat <<EOF > ${aptdir}/sources.list-${ARCH}
