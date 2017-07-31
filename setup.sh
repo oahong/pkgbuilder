@@ -10,9 +10,9 @@ source lib/common
 
 if [[ $EUID -ne 0 ]] ; then
     die "Root privilege is required to run setup script"
-elif [[ $username == root ]] ; then
-    die "You should run the setup script via sudo as a normal user"
 fi
+
+[[ -n $username ]] || die "Can't get usename from setup script"
 
 packages=(
     build-essential
@@ -20,7 +20,7 @@ packages=(
     devscripts
     eatmydata
     git
-    git-review
+#    git-review
     git-buildpackage
     tmux
     quilt
@@ -46,10 +46,3 @@ info "copy apt key"
 cp -av /etc/apt/trusted.gpg.d/ ${scriptdir}/apt
 
 mkdir -pv ${WORKBASE}/artifacts
-
-if [[ -d ${WORKBASE}/pkg_debian/.git ]] ; then
-	info "A copy of pkg_debian repository has been detected"
-else
-	info "clone pkg_debian repository"
-	git clone https://github.com/linuxdeepin/pkg_debian.git ${WORKBASE}/pkg_debian
-fi
