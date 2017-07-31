@@ -89,12 +89,12 @@ Application Options:
   -n, --package=PACKAGE        Build PACKAGE
   -u, --upload=HOST            Upload build artifacts to HOST, you should
                                define HOST in dput config
-  -b, --build                  Perform a package build using debuild
+  -b, --build                  Perform a package build using dpkg-buildpackage
   -p, --pbuilder               Perform a package build using pbuilder
                                (recommended for a clean buid)
 
 Note:
-$0 will not issue any build command (pdebuild or debuild) unless -p or -b option is specified.
+$0 will not issue any build command (pdebuild or dpkg-buildpackage) unless -p or -b option is specified.
 
 Examples:
   $0 -n dde-desktop                            Prepare for building dde-destop

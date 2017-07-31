@@ -139,17 +139,17 @@ buildPackage() {
                  ${COWBUILDEROPTS[@]}
         else
             if [[ ${ARCH} == 'sw_64' ]] ; then
-                local debuild_hook=sw64-fix-arch.hook
-                warn "Add debuild hook ${debuild_hook}"
-                BOPTS+=" --build-hook ${scriptdir}/hooks.d/debuild/${debuild_hook}"
+                local build_hook=sw64-fix-arch.hook
+                warn "Add build hook ${build_hook}"
+                BOPTS+=" --hook-build ${scriptdir}/hooks.d/debuild/${build_hook}"
             fi
             info "Checking build dependencies:"
             dpkg-checkbuilddeps -a ${ARCH} debian/control && \
                 info "Build dependencies satisfied" || \
                     return
 
-            info "Debuild options: ${BOPTS} ${DBPKGOPTS}"
-            eval debuild ${BOPTS} ${DBPKGOPTS}
+            info "buildpackage with options: ${BOPTS} ${DBPKGOPTS}"
+            eval dpkg-buildpackage ${BOPTS} ${DBPKGOPTS}
         fi
     fi
     popd
