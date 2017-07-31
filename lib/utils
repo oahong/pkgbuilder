@@ -77,5 +77,5 @@ urlDecode() {
 createWorkdir() {
     assert package
     workdir=${WORKBASE}/${package}
-    createdir ${workdir}
+    createdir ${workdir} "work base"
 }

@@ -66,8 +66,9 @@ contains() {
 createdir() {
     local dir=$1
     local desc=$2
+
     if [[ ! -d ${dir} ]];then
-        info "create $2 directory: $dir"
+        info "create $desc directory: $dir"
         mkdir -p $dir
     fi
 }

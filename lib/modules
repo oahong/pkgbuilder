@@ -24,7 +24,7 @@ initializePbuilder() {
     hasBin pbuilder   || die "Install pbuilder!!!"
     hasBin cowbuilder || die "Install cowbuilder!!!"
 
-    createdir ${WORKBASE}/deepin-chroot
+    createdir ${WORKBASE}/deepin-chroot "Cow master data"
 
     sudo cowbuilder --create	 \
          ${PBUILDEROPTS[@]}	 \
@@ -66,6 +66,7 @@ EOF
 
     # download debian source code
     createWorkdir
+
     pushd ${workdir}
     apt-get ${apt_options} source --download-only ${package}
     popd
