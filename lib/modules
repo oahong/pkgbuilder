@@ -142,7 +142,7 @@ buildPackage() {
             if [[ ${ARCH} == 'sw_64' ]] ; then
                 local build_hook=sw64-fix-arch.hook
                 warn "Add build hook ${build_hook}"
-                BOPTS+=" --hook-build ${scriptdir}/hooks.d/debuild/${build_hook}"
+                BOPTS+=" --hook-build=${scriptdir}/hooks.d/debuild/${build_hook}"
             fi
             info "Checking build dependencies:"
             dpkg-checkbuilddeps -a ${ARCH} debian/control && \
