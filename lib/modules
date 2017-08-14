@@ -107,14 +107,17 @@ downloadDebianSrc() {
 prepareBuild() {
     local srcdir=${workdir}/${package}-${version}
 
+    info "clean up $srcdir"
     rm -rf $srcdir
 
-    if [[ -n $dsc ]] ; then
+    if [[ -z $dsc ]] ; then
+        dsc=${package}_${version}.dsc
+    fi
+
+    if [[ -f ${workdir}/${dsc} ]] ; then
         dpkg-source -x ${workdir}/${dsc} ${srcdir}
-    elif [[ -f ${workdir}/${package}_${version}.dsc ]] ; then
-        dpkg-source -x ${workdir}/${package}_${version}.dsc ${srcdir}
     else
-        die "Not able to read debian source control file"
+        die "Fail to read Debian source control file"
     fi
 }
 
