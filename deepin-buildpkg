@@ -34,7 +34,7 @@ while : ; do
             shift 2
             ;;
         -d|--dsc)
-            dscurl=$2
+            dsc=$2
             shift 2
             ;;
         -l|--changelog)
@@ -82,7 +82,7 @@ source ${scriptdir}/conf/cowbuilder
 
 if [[ -n ${package} ]] ; then
     aptGetSource
-elif [[ -n ${dscurl} ]] ; then
+elif [[ -n ${dsc} ]] ; then
     downloadDebianSrc
 else
     die "'-n' or '-d' is mandatory option"

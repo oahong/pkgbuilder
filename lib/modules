@@ -82,7 +82,7 @@ EOF
 }
 
 downloadDebianSrc() {
-    local odscfile=$(basename ${dscurl})
+    local odscfile=$(basename ${dsc})
     local dscfile=$(urlDecode $odscfile)
 
     package=${dscfile%%_*}
@@ -90,10 +90,10 @@ downloadDebianSrc() {
 
     createWorkdir
 
-    if checkValidURL $dscurl ; then
+    if checkValidURL $dsc ; then
         hasBin dget || die "Missing devscripts in the system"
         pushd ${workdir}
-        dget -d -u ${dscurl}
+        dget -d -u ${dsc}
         # rename dscfile
         [[ $odscfile == $dscfile ]] || mv $odscfile $dscfile
         popd
@@ -101,7 +101,7 @@ downloadDebianSrc() {
 
     [[ -f ${workdir}/${dscfile} ]] || \
         die "Not able to find ${dscfile} in ${workdir}"
-    dscurl=$dscfile
+    dsc=$dscfile
 }
 
 prepareBuild() {
@@ -109,8 +109,8 @@ prepareBuild() {
 
     rm -rf $srcdir
 
-    if [[ -n $dscurl ]] ; then
-        dpkg-source -x ${workdir}/${dscurl} ${srcdir}
+    if [[ -n $dsc ]] ; then
+        dpkg-source -x ${workdir}/${dsc} ${srcdir}
     elif [[ -f ${workdir}/${package}_${PKGVER}.dsc ]] ; then
         dpkg-source -x ${workdir}/${package}_${PKGVER}.dsc ${srcdir}
     else

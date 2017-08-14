@@ -60,7 +60,7 @@ cat <<EOF
 We're building on architecture ${ARCH}:
     package:        ${package}
     changelog:      ${changelog}
-    dsc:            ${dscurl}
+    dsc:            ${dsc}
     builder:        ${builder}
     maintianer:     ${DEBFULLNAME}
 EOF
