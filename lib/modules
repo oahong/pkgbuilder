@@ -32,8 +32,17 @@ initializePbuilder() {
          ${COWBUILDEROPTS[@]}
 }
 
+createPbuilderChroot() {
+    if [[ ${usepbuilder} -eq 1 ]] ; then
+        configPbuilder ${scriptdir}/pbuilderrc
+        hasPackage eatmydata  ||   \
+            die "Please install eatmydata on the build host!!!"
+        hasPbuilderChroot || initializePbuilder
+    fi
+}
+
 # download debian src
-downloadDebianSrcFromUpstream() {
+aptGetSource() {
     local aptcache=
     local aptdir=${scriptdir}/apt
 
@@ -106,15 +115,6 @@ prepareBuild() {
         dpkg-source -x ${workdir}/${package}_${PKGVER}.dsc ${srcdir}
     else
         die "Not able to read debian source control file"
-    fi
-}
-
-createPbuilderChroot() {
-    if [[ ${usepbuilder} -eq 1 ]] ; then
-        configPbuilder ${scriptdir}/pbuilderrc
-        hasPackage eatmydata  ||   \
-            die "Please install eatmydata on the build host!!!"
-        hasPbuilderChroot || initializePbuilder
     fi
 }
 

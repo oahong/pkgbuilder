@@ -81,7 +81,7 @@ source ${scriptdir}/conf/cowbuilder
 [[ -z $changelog ]] && changelog="Rebuild on ${ARCH} via build script ${0##*/}"
 
 if [[ -n ${package} ]] ; then
-    downloadDebianSrcFromUpstream
+    aptGetSource
 elif [[ -n ${dscurl} ]] ; then
     downloadDebianSrc
 else
