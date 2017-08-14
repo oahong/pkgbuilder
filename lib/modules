@@ -132,15 +132,7 @@ buildPackage() {
 
     dch -a -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
 
-    if [[ $build_pkg_via_pbuilder -eq 1 ]] ; then
-        eval pdebuild --pbuilder cowbuilder  \
-             --use-pdebuild-internal         \
-             --debbuildopts '"${DBPKGOPTS}"' \
-             ${PBUILDEREXTRAOPTS[@]}         \
-             --                              \
-             ${PBUILDEROPTS[@]}              \
-             ${COWBUILDEROPTS[@]}
-    else
+    if [[ $build_pkg -eq 1 ]] ; then
         if [[ ${ARCH} == 'sw_64' ]] ; then
             local build_hook=sw64-fix-arch.hook
             warn "Add build hook ${build_hook}"
@@ -153,6 +145,14 @@ buildPackage() {
 
         info "buildpackage with options: ${BOPTS} ${DBPKGOPTS}"
         eval dpkg-buildpackage ${BOPTS} ${DBPKGOPTS}
+    else
+        eval pdebuild --pbuilder cowbuilder  \
+             --use-pdebuild-internal         \
+             --debbuildopts '"${DBPKGOPTS}"' \
+             ${PBUILDEREXTRAOPTS[@]}         \
+             --                              \
+             ${PBUILDEROPTS[@]}              \
+             ${COWBUILDEROPTS[@]}
     fi
 
     popd
