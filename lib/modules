@@ -33,7 +33,7 @@ initializePbuilder() {
 }
 
 createPbuilderChroot() {
-    if [[ ${usepbuilder} -eq 1 ]] ; then
+    if [[ ${build_pkg_via_pbuilder} -eq 1 ]] ; then
         configPbuilder ${scriptdir}/pbuilderrc
         hasPackage eatmydata  ||   \
             die "Please install eatmydata on the build host!!!"
@@ -123,36 +123,39 @@ buildPackage() {
     DBPKGOPTS+=" $@"
     pushd ${workdir}/${package}-${PKGVER}
 
-    if [[ $do_build -eq 1 ]] ; then
-        if [[ ${DEEPIN_PACKAGES} =~ " ${package} " ]] ; then
-	        dch -v ${PKGVER} -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
-        else
-            dch -a -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
-        fi
+    # return function unless build_pkg or use_pbuilder equals to 1
+    [[ ${build_pkg} -eq 1 ]] || \
+        [[ ${use_pbuilder} -eq 1 ]] || return 0
 
-        if [[ $usepbuilder -eq 1 ]] ; then
-            eval pdebuild --pbuilder cowbuilder \
-                 --use-pdebuild-internal         \
-                 --debbuildopts '"${DBPKGOPTS}"' \
-                 ${PBUILDEREXTRAOPTS[@]}         \
-                 --                              \
-                 ${PBUILDEROPTS[@]}              \
-                 ${COWBUILDEROPTS[@]}
-        else
-            if [[ ${ARCH} == 'sw_64' ]] ; then
-                local build_hook=sw64-fix-arch.hook
-                warn "Add build hook ${build_hook}"
-                BOPTS+=" --hook-build=${scriptdir}/hooks.d/debuild/${build_hook}"
-            fi
-            info "Checking build dependencies:"
-            dpkg-checkbuilddeps -a ${ARCH} debian/control && \
-                info "Build dependencies satisfied" || \
-                    return
-
-            info "buildpackage with options: ${BOPTS} ${DBPKGOPTS}"
-            eval dpkg-buildpackage ${BOPTS} ${DBPKGOPTS}
-        fi
+    if [[ ${DEEPIN_PACKAGES} =~ " ${package} " ]] ; then
+	    dch -v ${PKGVER} -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
+    else
+        dch -a -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
     fi
+
+    if [[ $build_pkg_via_pbuilder -eq 1 ]] ; then
+        eval pdebuild --pbuilder cowbuilder  \
+             --use-pdebuild-internal         \
+             --debbuildopts '"${DBPKGOPTS}"' \
+             ${PBUILDEREXTRAOPTS[@]}         \
+             --                              \
+             ${PBUILDEROPTS[@]}              \
+             ${COWBUILDEROPTS[@]}
+    else
+        if [[ ${ARCH} == 'sw_64' ]] ; then
+            local build_hook=sw64-fix-arch.hook
+            warn "Add build hook ${build_hook}"
+            BOPTS+=" --hook-build=${scriptdir}/hooks.d/debuild/${build_hook}"
+        fi
+        info "Checking build dependencies:"
+        dpkg-checkbuilddeps -a ${ARCH} debian/control && \
+            info "Build dependencies satisfied" || \
+                return
+
+        info "buildpackage with options: ${BOPTS} ${DBPKGOPTS}"
+        eval dpkg-buildpackage ${BOPTS} ${DBPKGOPTS}
+    fi
+
     popd
 }
 

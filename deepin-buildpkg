@@ -50,12 +50,11 @@ while : ; do
             shift 2
             ;;
         -b|--build)
-            do_build=1
+            build_pkg=1
             shift
             ;;
         -p|--pbuilder)
-            usepbuilder=1
-            do_build=1
+            build_pkg_via_pbuilder=1
             shift
             ;;
         -h|--help)

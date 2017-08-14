@@ -52,8 +52,8 @@ checkValidURL() {
 printBuildInfo() {
     local builder='None'
 
-    [[ $do_build -eq 1 ]] && builder=dpkg-buildpackage
-    [[ $usepbuilder -eq 1 ]] && builder=cowbuilder
+    [[ $build_pkg -eq 1 ]] && builder=dpkg-buildpackage
+    [[ $build_pkg_via_pbuilder -eq 1 ]] && builder=cowbuilder
 
     info "Build script version: $SVERSION"
 cat <<EOF
