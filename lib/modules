@@ -128,7 +128,7 @@ buildPackage() {
 
     # return function unless build_pkg or use_pbuilder equals to 1
     [[ ${build_pkg} -eq 1 ]] || \
-        [[ ${use_pbuilder} -eq 1 ]] || return 0
+        [[ ${build_pkg_via_pbuilder} -eq 1 ]] || return 0
 
     dch -a -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
 
