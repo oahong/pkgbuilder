@@ -139,9 +139,11 @@ buildPackage() {
             BOPTS+=" --hook-build=${scriptdir}/hooks.d/debuild/${build_hook}"
         fi
         info "Checking build dependencies:"
-        dpkg-checkbuilddeps -a ${ARCH} debian/control && \
-            info "Build dependencies satisfied" || \
-                return
+        if dpkg-checkbuilddeps -a ${ARCH} debian/control; then
+            info "Build dependencies satisfied"
+        else
+            die EDEPS "Build dependencies unsatisfied"
+        fi
 
         info "buildpackage with options: ${BOPTS} ${DBPKGOPTS}"
         eval dpkg-buildpackage ${BOPTS} ${DBPKGOPTS}
