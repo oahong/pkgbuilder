@@ -5,7 +5,7 @@ set -e
 declare -r scriptdir=$(dirname $(readlink -ef $0))
 
 declare -ra modules=(
-    conf/{env,mirrors}
+    conf/{env,mirrors,errors}
     lib/{common,utils,modules}
 )
 
@@ -23,7 +23,7 @@ OPTS=$(getopt -n $0 \
               --long arch:,dsc:,changelog:,package:,upload:,build,help,pbuilder \
               -- "$@")
 
-[[ $? -eq 0 ]] || die "Sorry! I don't understand!!!"
+[[ $? -eq 0 ]] || die EOPTS "Sorry! I don't understand!!!"
 
 eval set -- "${OPTS}"
 
@@ -72,7 +72,7 @@ while : ; do
     esac
 done
 
-contains ARCH ARCHITECTURES || die "$ARCH is an unsupported architecture"
+contains ARCH ARCHITECTURES || die EARCH "$ARCH is an unsupported architecture"
 
 source ${scriptdir}/conf/cowbuilder
 
@@ -84,7 +84,7 @@ if [[ -n ${package} ]] ; then
 elif [[ -n ${dsc} ]] ; then
     downloadDebianSrc
 else
-    die "'-n' or '-d' is mandatory option"
+    die EOPTS "'-n' or '-d' is mandatory option"
 fi
 
 printBuildInfo

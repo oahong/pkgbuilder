@@ -21,8 +21,8 @@ EOF
 }
 
 initializePbuilder() {
-    hasBin pbuilder   || die "Install pbuilder!!!"
-    hasBin cowbuilder || die "Install cowbuilder!!!"
+    hasBin pbuilder   || die EPACKAGE "Install pbuilder!!!"
+    hasBin cowbuilder || die EPACKAGE "Install cowbuilder!!!"
 
     createdir ${WORKBASE}/deepin-chroot "Cow master data"
 
@@ -36,7 +36,7 @@ createPbuilderChroot() {
     if [[ ${build_pkg_via_pbuilder} -eq 1 ]] ; then
         configPbuilder ${scriptdir}/pbuilderrc
         hasPackage eatmydata  ||   \
-            die "Please install eatmydata on the build host!!!"
+            die EPACKAGE "Please install eatmydata on the build host!!!"
         hasPbuilderChroot || initializePbuilder
     fi
 }
@@ -91,7 +91,7 @@ downloadDebianSrc() {
     createWorkdir
 
     if checkValidURL $dsc ; then
-        hasBin dget || die "Missing devscripts in the system"
+        hasBin dget || die EPACKAGE "Missing devscripts in the system"
         pushd ${workdir}
         dget -d -u ${dsc}
         # rename dscfile
@@ -100,7 +100,7 @@ downloadDebianSrc() {
     fi
 
     [[ -f ${workdir}/${dscfile} ]] || \
-        die "Not able to find ${dscfile} in ${workdir}"
+        die EACCESS "Not able to find ${dscfile} in ${workdir}"
     dsc=$dscfile
 }
 
@@ -117,7 +117,7 @@ prepareBuild() {
     if [[ -f ${workdir}/${dsc} ]] ; then
         dpkg-source -x ${workdir}/${dsc} ${srcdir}
     else
-        die "Fail to read Debian source control file"
+        die EACCESS "Fail to read Debian source control file"
     fi
 }
 
@@ -160,6 +160,6 @@ buildPackage() {
 
 uploadArtifacts() {
     [[ -z $uhost ]] && return 0
-    hasBin dput || die "Missing dput in the system!!!"
+    hasBin dput || die EPACKAGE "Missing dput in the system!!!"
     dput -uf ${uhost} $(ls -At ${workdir}/*.changes| head -n 1)
 }

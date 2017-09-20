@@ -3,7 +3,7 @@
 dquilt() {
     local quiltrc=${HOME}/.quiltrc-dpkg
 
-    hasBin quilt || die "Install quilt!!!"
+    hasBin quilt || die EPACKAGE "Install quilt!!!"
 
     if [[ ! -f $quiltrc ]] ; then
         info "Write quilt configuration: $quiltrc"
@@ -31,10 +31,10 @@ hasPbuilderChroot() {
     if [[ -x ${pbuilderroot}/bin/ls ]] ; then
         return 0
     else
-	if [[ -d ${pbuilderroot} ]] ; then
+	    if [[ -d ${pbuilderroot} ]] ; then
             warn "Incompleted pbuilder environment detected at ${pbuilderroot}"
             die "You should manually remove ${pbuilderroot} and run the script again"
-	fi
+	    fi
         return 1
     fi
 }

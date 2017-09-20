@@ -10,8 +10,14 @@ declare -Ar color=(
 )
 
 die() {
-    echo -e "${color[error]}E:${color[reset]} $BASH_LINENO: $@" >&2
-    exit 1
+    local ecode=EMISC
+    if [[ $1 =~ ^[0-9]+ ]] ; then
+        ecode=$1
+        shift
+    fi
+
+    echo -e "${color[error]}E:${color[reset]} $BASH_LINENO: $ecode $@" >&2
+    exit ${ERROR[ecode]}
 }
 
 info() {
