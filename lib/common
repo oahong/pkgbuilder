@@ -18,7 +18,7 @@ die() {
     fi
 
     echo -e "${color[error]}E:=$ecode=${color[reset]} $BASH_LINENO: $@" >&2
-    exit ${ERROR[ecode]}
+    exit ${ERROR[$ecode]}
 }
 
 info() {
