@@ -1,0 +1,16 @@
+declare -Ar ERROR=(
+	# dependency error
+	EDEPS=[1]
+	# option error
+	EOPTS=[2]
+	# access error
+	EACCESS=[3]
+	# permission error
+	EPERM=[4]
+	# missing package
+	EPACKAGE=[5]
+    # architecture not supported
+    EARCH=[6]
+	# undefined error
+	EMISC=[20]
+)
