@@ -7,9 +7,10 @@ configPbuilder() {
 
     # Always overwrite the configuration
     cat <<EOF > $pbuilderrc
+APTCACHE=${WORKBASE}/aptcache
 AUTO_DEBSIGN=no
-ARCHITECTURE="${ARCH}"
-BINDMOUNT="$WORKBASE"
+ARCHITECTURE=${ARCH}
+BINDMOUNT=${WORKBASE}
 ALLOWUNTRUSTED=yes
 DEBOOTSTRAPOPTS=( '--variant=buildd' '--no-check-gpg' )
 EXTRAPACKAGES="lintian eatmydata"
