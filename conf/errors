@@ -1,16 +1,10 @@
 declare -Ar ERROR=(
-    # dependency error
-    [EDEPS]=1
-    # option error
-    [EOPTS]=2
-    # access error
-    [EACCESS]=3
-    # permission error
-    [EPERM]=4
-    # missing package
-    [EPACKAGE]=5
-    # architecture not supported
-    [EARCH]=6
-    # undefined error
-    [EMISC]=20
+    [EDEPS]=1       # dependency error
+    [EOPTS]=2       # command option error
+    [EACCESS]=3     # file access error
+    [EPERM]=4       # permission error
+    [EPACKAGE]=5    # missing package
+    [EARCH]=6       # architecture not supported
+    [EBUILD]=7      # build failed
+    [EMISC]=20      # undefined error
 )
