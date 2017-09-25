@@ -148,6 +148,7 @@ buildPackage() {
         info "buildpackage with options: ${BOPTS} ${DBPKGOPTS}"
         eval dpkg-buildpackage ${BOPTS} ${DBPKGOPTS}
     else
+        rm -f ${workdir}/success
         eval pdebuild --pbuilder cowbuilder  \
              --use-pdebuild-internal         \
              --debbuildopts '"${DBPKGOPTS}"' \
@@ -155,6 +156,7 @@ buildPackage() {
              --                              \
              ${PBUILDEROPTS[@]}              \
              ${COWBUILDEROPTS[@]}
+        [[ -f ${workdir}/success ]] || die EBUILD "Failed to build ${package}-${version}"
     fi
 
     popd
