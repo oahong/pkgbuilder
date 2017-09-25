@@ -155,7 +155,6 @@ buildPackage() {
              --                              \
              ${PBUILDEROPTS[@]}              \
              ${COWBUILDEROPTS[@]}
-        [[ $? -eq 0 ]] || die EBUILD "Failed to build ${package}-${version}"
     fi
 
     popd
