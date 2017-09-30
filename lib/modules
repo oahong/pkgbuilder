@@ -126,18 +126,20 @@ buildPackage() {
     DEBBUILDOPTS+=" $@"
     pushd ${workdir}/${package}-${version}
 
-    # return function unless build_pkg or use_pbuilder equals to 1
+    # return unless we want to build a package
     [[ ${build_pkg} -eq 1 ]] || \
         [[ ${build_pkg_via_pbuilder} -eq 1 ]] || return 0
 
     dch -a -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
 
+    case ${ARCH} in
+	sw_64)
+            warn "Add a build hook for ${ARCH} platform"
+            DEBBUILDOPTS+=" --hook-build=${scriptdir}/hooks.d/debuild/sw64-fix-arch.hook"
+	    ;;
+    esac
+
     if [[ $build_pkg -eq 1 ]] ; then
-        if [[ ${ARCH} == 'sw_64' ]] ; then
-            local build_hook=sw64-fix-arch.hook
-            warn "Add build hook ${build_hook}"
-            DEBBUILDOPTS+=" --hook-build=${scriptdir}/hooks.d/debuild/${build_hook}"
-        fi
         info "Checking build dependencies:"
         if dpkg-checkbuilddeps -a ${ARCH} debian/control; then
             info "Build dependencies satisfied"
