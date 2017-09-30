@@ -123,7 +123,7 @@ prepareBuild() {
 
 buildPackage() {
     # override default dpkg-buildpackage options
-    DBPKGOPTS+=" $@"
+    DEBBUILDOPTS+=" $@"
     pushd ${workdir}/${package}-${version}
 
     # return function unless build_pkg or use_pbuilder equals to 1
@@ -136,7 +136,7 @@ buildPackage() {
         if [[ ${ARCH} == 'sw_64' ]] ; then
             local build_hook=sw64-fix-arch.hook
             warn "Add build hook ${build_hook}"
-            DBPKGOPTS+=" --hook-build=${scriptdir}/hooks.d/debuild/${build_hook}"
+            DEBBUILDOPTS+=" --hook-build=${scriptdir}/hooks.d/debuild/${build_hook}"
         fi
         info "Checking build dependencies:"
         if dpkg-checkbuilddeps -a ${ARCH} debian/control; then
@@ -145,13 +145,13 @@ buildPackage() {
             die EDEPS "Build dependencies unsatisfied"
         fi
 
-        info "buildpackage with options: ${DBPKGOPTS}"
-        eval dpkg-buildpackage ${DBPKGOPTS}
+        info "buildpackage with options: ${DEBBUILDOPTS}"
+        eval dpkg-buildpackage ${DEBBUILDOPTS}
     else
         rm -f ${workdir}/success
         eval pdebuild --pbuilder cowbuilder  \
              --use-pdebuild-internal         \
-             --debbuildopts '"${DBPKGOPTS}"' \
+             --debbuildopts '"${DEBBUILDOPTS}"' \
              ${PBUILDEREXTRAOPTS[@]}         \
              --                              \
              ${PBUILDEROPTS[@]}              \

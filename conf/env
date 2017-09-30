@@ -3,7 +3,7 @@
 declare -r SVERSION="v0.4.0"
 
 declare ARCH=$(dpkg-architecture -qDEB_HOST_ARCH)
-declare DBPKGOPTS="-d -us -uc -sa -jauto"
+declare DEBBUILDOPTS="-d -us -uc -sa -jauto"
 
 declare -ra ARCHITECTURES=(
     mips64el
