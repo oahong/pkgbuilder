@@ -136,7 +136,7 @@ buildPackage() {
         if [[ ${ARCH} == 'sw_64' ]] ; then
             local build_hook=sw64-fix-arch.hook
             warn "Add build hook ${build_hook}"
-            BOPTS+=" --hook-build=${scriptdir}/hooks.d/debuild/${build_hook}"
+            DBPKGOPTS+=" --hook-build=${scriptdir}/hooks.d/debuild/${build_hook}"
         fi
         info "Checking build dependencies:"
         if dpkg-checkbuilddeps -a ${ARCH} debian/control; then
@@ -145,8 +145,8 @@ buildPackage() {
             die EDEPS "Build dependencies unsatisfied"
         fi
 
-        info "buildpackage with options: ${BOPTS} ${DBPKGOPTS}"
-        eval dpkg-buildpackage ${BOPTS} ${DBPKGOPTS}
+        info "buildpackage with options: ${DBPKGOPTS}"
+        eval dpkg-buildpackage ${DBPKGOPTS}
     else
         rm -f ${workdir}/success
         eval pdebuild --pbuilder cowbuilder  \
