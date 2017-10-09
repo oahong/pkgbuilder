@@ -3,7 +3,7 @@
 declare -r BASEMIRROR=http://s135.sh.deepin.cn
 declare -Ar MIRRORSITE=(
     [mips64el]="${BASEMIRROR}/mips64el-deepin"
-    [sw_64]="${BASEMIRROR}/raise3.2"
+    [sw_64]="${BASEMIRROR}/sw6a"
 )
 
 declare -Ar UPSTREAMREPO=(
