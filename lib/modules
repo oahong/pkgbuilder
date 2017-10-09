@@ -131,18 +131,19 @@ buildPackage() {
     [[ ${build_pkg} -eq 1 ]] || \
         [[ ${build_pkg_via_pbuilder} -eq 1 ]] || return 0
 
-    local builder=debuild
-    [[ ${build_pkg_via_pbuilder} ]] && builder=pbuilder
+    local hookdir=${scriptdir}/hooks.d/debuild
+    # pbuilder will copy hooks into chroots
+    [[ ${build_pkg_via_pbuilder} ]] && hookdir=/tmp/hooks
 
     dch -a -D ${DISTRIBUTIONS[$ARCH]} "${changelog}"
 
     case ${ARCH} in
         sw_64)
             warn "Add a build hook for ${ARCH} platform"
-            DEBBUILDOPTS+=" --hook-build=${scriptdir}/hooks.d/${builder}/sw64-fix-arch.hook"
+            DEBBUILDOPTS+=" --hook-build=${hookdir}/sw64-fix-arch.hook"
 	        ;;
     esac
-    
+
     if [[ $build_pkg -eq 1 ]] ; then
         info "Checking build dependencies:"
         if dpkg-checkbuilddeps -a ${ARCH} debian/control; then
