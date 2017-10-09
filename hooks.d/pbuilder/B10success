@@ -1,4 +1,0 @@
-#! /bin/sh
-
-# indicates a success build
-env > $HOME/success
