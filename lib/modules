@@ -155,7 +155,6 @@ buildPackage() {
         info "buildpackage with options: ${DEBBUILDOPTS}"
         eval dpkg-buildpackage ${DEBBUILDOPTS}
     else
-        rm -f ${workdir}/success
         eval pdebuild --pbuilder cowbuilder  \
              --use-pdebuild-internal         \
              --debbuildopts '"${DEBBUILDOPTS}"' \
@@ -163,7 +162,6 @@ buildPackage() {
              --                              \
              ${PBUILDEROPTS[@]}              \
              ${COWBUILDEROPTS[@]}
-        [[ -f ${workdir}/success ]] || die EBUILD "Failed to build ${package}-${version}"
     fi
 
     popd
