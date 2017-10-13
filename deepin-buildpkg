@@ -16,7 +16,7 @@ for module in ${modules[@]}; do
     source ${scriptdir}/$module
 done
 
-[[ $EUID -eq 0 ]] && warn "You should build package with an unpriviledged user"
+[[ $EUID -eq 0 ]] && die "Don't build package with privileged user"
 
 OPTS=$(getopt -n $0 \
               -o 'a:d:l:n:u:bhp' \
