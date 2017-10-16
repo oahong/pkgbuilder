@@ -122,9 +122,6 @@ prepareBuild() {
 }
 
 buildPackage() {
-    # override default dpkg-buildpackage options
-    DEBBUILDOPTS+=" $@"
-
     pushd ${workdir}/${package}-${version}
 
     # return unless we want to build a package
@@ -143,6 +140,9 @@ buildPackage() {
             DEBBUILDOPTS+=" --hook-build=${hookdir}/sw64-fix-arch.hook"
 	        ;;
     esac
+
+    # function parameter should override DEBBUILDOPTS
+    DEBBUILDOPTS+=" $@"
 
     if [[ $build_pkg -eq 1 ]] ; then
         info "Checking build dependencies:"
