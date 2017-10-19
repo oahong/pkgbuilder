@@ -136,9 +136,10 @@ buildPackage() {
 
     case ${ARCH} in
         sw_64)
-            warn "Add a build hook for ${ARCH} platform"
+            warn "Add a hooks for ${ARCH} platform"
+            DEBBUILDOPTS+=" --hook-init=${hookdir}/sw64-check-sw64ize.hook"
             DEBBUILDOPTS+=" --hook-build=${hookdir}/sw64-fix-arch.hook"
-	        ;;
+            ;;
     esac
 
     # function parameter should override DEBBUILDOPTS
