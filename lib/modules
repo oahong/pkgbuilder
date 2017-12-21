@@ -1,46 +1,5 @@
 #! /bin/bash
 
-configPbuilder() {
-    local pbuilderrc=$1
-    # Should I use options instead of configuration?
-    info "Initialize pbuilder configuration"
-
-    # Always overwrite the configuration
-    cat <<EOF > $pbuilderrc
-APTCACHE=${WORKBASE}/aptcache
-AUTO_DEBSIGN=no
-ARCHITECTURE=${ARCH}
-BINDMOUNT=${WORKBASE}
-ALLOWUNTRUSTED=yes
-DEBOOTSTRAPOPTS=( '--variant=buildd' '--no-check-gpg' )
-EXTRAPACKAGES="lintian eatmydata"
-MIRRORSITE="${MIRRORSITE[${ARCH}]}"
-# pbuilder >= 0.225
-EATMYDATA=yes
-EOF
-}
-
-initializePbuilder() {
-    hasBin pbuilder   || die EPACKAGE "Install pbuilder!!!"
-    hasBin cowbuilder || die EPACKAGE "Install cowbuilder!!!"
-
-    createdir ${WORKBASE}/deepin-chroot "Cow master data"
-
-    sudo cowbuilder --create	 \
-         ${PBUILDEROPTS[@]}	 \
-         ${PBUILDEREXTRAOPTS[@]} \
-         ${COWBUILDEROPTS[@]}
-}
-
-createPbuilderChroot() {
-    if [[ ${build_pkg_via_pbuilder} -eq 1 ]] ; then
-        configPbuilder ${scriptdir}/pbuilderrc
-        hasPackage eatmydata  ||   \
-            die EPACKAGE "Please install eatmydata on the build host!!!"
-        hasPbuilderChroot || initializePbuilder
-    fi
-}
-
 # download debian src
 aptGetSource() {
     local aptcache=

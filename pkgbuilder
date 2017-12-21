@@ -6,7 +6,7 @@ declare -r scriptdir=$(dirname $(readlink -ef $0))
 
 declare -ra modules=(
     conf/{env,mirrors,errors}
-    lib/{common,utils,modules}
+    lib/{common,utils,modules,pbuilder}
 )
 
 ##########
