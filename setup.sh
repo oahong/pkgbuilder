@@ -45,4 +45,7 @@ ln -sfv ${scriptdir}/pkgbuilder /usr/local/bin
 info "copy apt key"
 cp -av /etc/apt/trusted.gpg.d/ ${scriptdir}/apt
 
+info "Remove old executable"
+rm /usr/local/bin/deepin-buildpackage
+
 mkdir -pv ${WORKBASE}/artifacts
