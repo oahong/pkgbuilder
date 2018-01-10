@@ -1,0 +1,16 @@
+#! /bin/bash
+
+# Append -mieee to buildflags.conf
+# should I move the hook to G<digit><digit><whatever-else-you-want>
+ARCH=$(dpkg-architecture -qDEB_HOST_ARCH)
+
+case ${ARCH} in
+    sw*)
+        cat > /etc/dpkg/buildflags.conf <<EOF
+APPEND CFLAGS -mieee
+APPEND CXXFLAGS -mieee
+EOF
+        ;;
+esac
+
+exit 0
