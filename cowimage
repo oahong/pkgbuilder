@@ -31,7 +31,5 @@ case $cmd in
 	echo "Usage: $0 update|login [architecture]"
 	exit 1
 	;;
-    *)
-	
 esac
 
