@@ -52,6 +52,10 @@ checkValidURL() {
 printBuildInfo() {
     local builder='None'
 
+    info "Wait a few seconds, I'll show your upstream package versions, for reference only"
+    rmadison $package
+    sleep 5
+
     [[ $build_pkg -eq 1 ]] && builder=dpkg-buildpackage
     [[ $build_pkg_via_pbuilder -eq 1 ]] && builder=cowbuilder
 
