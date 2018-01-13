@@ -138,7 +138,8 @@ moveArtifacts() {
 }
 
 uploadArtifacts() {
-    [[ -z $uhost ]] && return 0
-    hasBin dput || die EPACKAGE "Missing dput in the system!!!"
-    dput -uf ${uhost} $(ls -At ${workdir}/*.changes| head -n 1)
+    hasBin dput || die EPACKAGE "Install dput"
+    if dput -H | grep -wqs uhost ; then
+       dput -uf ${uhost} ${WORKBASE}/artifacts/${package}_${version}_${ARCH}.changes
+    fi
 }
