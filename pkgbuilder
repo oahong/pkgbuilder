@@ -93,6 +93,7 @@ prepareBuild
 createPbuilderChroot
 # everything else beyond '--' in command line goes to buildPackage function
 buildPackage $@
+moveArtifacts
 uploadArtifacts
 
 # vim: number tabstop=4 softtabstop=4 expandtab
