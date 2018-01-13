@@ -36,6 +36,7 @@ EOF
     createWorkdir
 
     pushd ${workdir}
+    info "Downloading source package from ${UPSTREAMREPO[$ARCH]}"
     apt-get ${apt_options} source --download-only ${package}
     popd
 }
