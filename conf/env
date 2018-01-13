@@ -1,6 +1,6 @@
 #! /bin/bash
 
-declare -r SVERSION="v0.5.0"
+declare -r SVERSION=$(git describe HEAD)
 
 declare ARCH=$(dpkg-architecture -qDEB_HOST_ARCH)
 declare DEBBUILDOPTS="-d -us -uc -sa -jauto"
