@@ -14,4 +14,4 @@ declare -rA DISTRIBUTIONS=(
 )
 
 declare -r WORKBASE=${scriptdir%/*}
-declare -r SVERSION=$(git --git-dir=${WORKBASE}/.git describe HEAD)
+declare -r SVERSION=$(git --git-dir=${scriptdir}/.git describe HEAD)
