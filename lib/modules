@@ -126,6 +126,7 @@ buildPackage() {
     fi
 
     popd
+    moveArtifacts
 }
 
 moveArtifacts() {
