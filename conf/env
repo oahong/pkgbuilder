@@ -1,7 +1,5 @@
 #! /bin/bash
 
-declare -r SVERSION=$(git describe HEAD)
-
 declare ARCH=$(dpkg-architecture -qDEB_HOST_ARCH)
 declare DEBBUILDOPTS="-d -us -uc -sa -jauto"
 
@@ -16,3 +14,4 @@ declare -rA DISTRIBUTIONS=(
 )
 
 declare -r WORKBASE=${scriptdir%/*}
+declare -r SVERSION=$(git --git-dir=${WORKBASE}/.git describe HEAD)
