@@ -84,7 +84,7 @@ printHelp() {
     local cmd=${0##*/}
     cat <<EOF >&2
 Usage:
-  ${cmd}-n PACKAGE|-d DSC [-a ARCH] [-l CHANGELOG] [-u HOST] [-w WORKDIR] [-b|-p] [-h]
+  ${cmd} -n PACKAGE|-d DSC [-a ARCH] [-l CHANGELOG] [-u HOST] [-b|-p] [-h]
 
 Package builder for deepin mips team, version $SVERSION
 
