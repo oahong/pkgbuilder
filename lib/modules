@@ -114,7 +114,8 @@ buildPackage() {
         fi
 
         info "buildpackage with options: ${DEBBUILDOPTS}"
-        eval dpkg-buildpackage ${DEBBUILDOPTS}
+        eval dpkg-buildpackage ${DEBBUILDOPTS} || \
+                die EBUILD "Failed to build ${package} via dpkg-buildpackage"
     else
         eval pdebuild --pbuilder cowbuilder  \
              --use-pdebuild-internal         \
@@ -122,7 +123,8 @@ buildPackage() {
              ${PBUILDEREXTRAOPTS[@]}         \
              --                              \
              ${PBUILDEROPTS[@]}              \
-             ${COWBUILDEROPTS[@]}
+             ${COWBUILDEROPTS[@]} || \
+             die EBUILD "Failed to build ${package} via cowbuilder"
     fi
 
     popd
