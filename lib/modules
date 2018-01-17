@@ -142,7 +142,9 @@ moveArtifacts() {
 
 uploadArtifacts() {
     hasBin dput || die EPACKAGE "Install dput"
+    [[ -n $uhost ]] || return
     if dput -H | grep -wqs ${uhost} ; then
        dput -uf ${uhost} ${WORKBASE}/artifacts/${package}_${version}_${ARCH}.changes
     fi
 }
+# vim: number tabstop=4 softtabstop=4 expandtab
