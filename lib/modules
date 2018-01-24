@@ -57,6 +57,20 @@ downloadDebianSrc() {
         # rename dscfile
         [[ $odscfile == $dscfile ]] || mv $odscfile $dscfile
         popd
+    elif [[ -f $dsc ]] ; then
+        # $dsc is a local file
+        cp -v ${dsc} ${workdir}/
+        local dscpath=$(dirname ${dsc})
+        dcmd ${dsc} | grep -v 'dsc$' | while read -r line; do
+            if [[ x${line} == x ]]; then
+                continue
+            fi
+            if [[ -f ${dscpath}/${line}  ]] ; then
+                cp -v ${dscpath}/${line} ${workdir}/
+            else
+                die EACCESS "Not able to find ${line} in ${dscpath}"
+            fi
+        done
     fi
 
     [[ -f ${workdir}/${dscfile} ]] || \
