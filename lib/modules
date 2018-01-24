@@ -54,23 +54,14 @@ downloadDebianSrc() {
         hasBin dget || die EPACKAGE "Missing devscripts in the system"
         pushd ${workdir}
         dget -d -u ${dsc}
-        # rename dscfile
+        # rename dscfile to decode url patterns
+        # http://www.degraeve.com/reference/urlencoding.php
         [[ $odscfile == $dscfile ]] || mv $odscfile $dscfile
         popd
     elif [[ -f $dsc ]] ; then
         # $dsc is a local file
-        cp -v ${dsc} ${workdir}/
-        local dscpath=$(dirname ${dsc})
-        dcmd ${dsc} | grep -v 'dsc$' | while read -r line; do
-            if [[ x${line} == x ]]; then
-                continue
-            fi
-            if [[ -f ${dscpath}/${line}  ]] ; then
-                cp -v ${dscpath}/${line} ${workdir}/
-            else
-                die EACCESS "Not able to find ${line} in ${dscpath}"
-            fi
-        done
+        dcm cp ${dsc} ${workdir} || \
+            die EACCESS "Not able to find ${line} in ${dscpath}"
     fi
 
     [[ -f ${workdir}/${dscfile} ]] || \
