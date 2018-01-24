@@ -59,8 +59,12 @@ downloadDebianSrc() {
         [[ $odscfile == $dscfile ]] || mv $odscfile $dscfile
         popd
     elif [[ -f $dsc ]] ; then
-        # dsc is a local file which does not reside in workdir
-        if [[ $(dirname $(realpath -e ${dsc})) != ${workdir} ]] ; then
+        # dsc is a local file
+        local dscpath=$(dirname $(realpath -e ${dsc}))
+        if [[ ${dscpath} == ${workdir} || \
+                  ${dscpath} == ${ARTIFACTS}/${package} ]] ; then
+            : do nothing if dsc resides in these places
+        else
             # copy source package to workdir
             dcmd cp -v ${dsc} ${workdir} || \
                 die EACCESS "Not able to copy source package recorded in $dsc to $workdir"
@@ -81,8 +85,17 @@ prepareBuild() {
         dsc=${package}_${version}.dsc
     fi
 
-    if [[ -f ${workdir}/${dsc} ]] ; then
-        dpkg-source -x ${workdir}/${dsc} ${srcdir}
+    local dscinw=${workdir}/${dsc}
+    local dscina=${ARTIFACTS}/${package}/${dsc}
+
+    if [[ -f ${dscinw} ]] ; then
+        # debian source control in workdir
+        info "Found ${dscinb}"
+        dpkg-source -x ${dscinw} ${srcdir}
+    elif [[ -f ${dscina} ]] ; then
+        # debian source control in artifacts
+        info "Found ${dscina}"
+        dpkg-source -x ${dscina} ${srcdir}
     else
         die EACCESS "Fail to read Debian source control file"
     fi
