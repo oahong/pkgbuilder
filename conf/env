@@ -12,6 +12,7 @@ declare -rA DISTRIBUTIONS=(
 )
 
 declare -r WORKBASE=${scriptdir%/*}
+declare -r ARTIFACTS=${WORKBASE}/artifacts
 declare -r SVERSION=$(git --git-dir=${scriptdir}/.git describe HEAD)
 
 # Local variables:
