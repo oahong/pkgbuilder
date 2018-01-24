@@ -49,24 +49,26 @@ downloadDebianSrc() {
     version=$(echo ${dscfile//.dsc} | sed -e "s/${package}_//")
 
     createWorkdir
-
+    # dsc is an uri
     if checkValidURL $dsc ; then
-        hasBin dget || die EPACKAGE "Missing devscripts in the system"
+        hasBin dget || die EPACKAGE "Install devscripts"
         pushd ${workdir}
         dget -d -u ${dsc}
-        # rename dscfile to decode url patterns
+        # Make sure the final dscfile is url decoded
         # http://www.degraeve.com/reference/urlencoding.php
         [[ $odscfile == $dscfile ]] || mv $odscfile $dscfile
         popd
     elif [[ -f $dsc ]] ; then
-        # $dsc is a local file
-        dcm cp ${dsc} ${workdir} || \
-            die EACCESS "Not able to find ${line} in ${dscpath}"
+        # dsc is a local file which does not reside in workdir
+        if [[ $(dirname $(realpath -e ${dsc})) != ${workdir} ]] ; then
+            # copy source package to workdir
+            dcmd cp -v ${dsc} ${workdir} || \
+                die EACCESS "Not able to copy source package recorded in $dsc to $workdir"
+        fi
     fi
-
-    [[ -f ${workdir}/${dscfile} ]] || \
-        die EACCESS "Not able to find ${dscfile} in ${workdir}"
     dsc=$dscfile
+    [[ -f ${workdir}/${dscfile} ]] || \
+        die EACCESS "Not able to locate ${dscfile} in ${workdir}"
 }
 
 prepareBuild() {
