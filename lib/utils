@@ -87,7 +87,7 @@ createWorkdir() {
 # http://wiki.bash-hackers.org/howto/mutex
 lockScript() {
     local lockfile=/tmp/${package}-${version}-lock
-    if ( set -o noclobber; echo $$ > $lockfile ) 2 > /dev/null ; then
+    if ( set -o noclobber; echo $$ > $lockfile ) 2>/dev/null ; then
         info "Acquiring a mutex lock on $lockfile"
         trap "rm -f $lockfile; exit $?" INT TERM EXIT
     else
