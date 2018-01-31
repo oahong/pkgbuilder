@@ -89,12 +89,11 @@ prepareBuild() {
     local dscinw=${workdir}/${dsc}
     local dscina=${ARTIFACTS}/${package}/${dsc}
 
+    # Searching debian source control file in workdir o/ artifacts
     if [[ -f ${dscinw} ]] ; then
-        # debian source control in workdir
         info "Found ${dscinb}"
         dpkg-source -x ${dscinw} ${srcdir}
     elif [[ -f ${dscina} ]] ; then
-        # debian source control in artifacts
         info "Found ${dscina}"
         dpkg-source -x ${dscina} ${srcdir}
     else
