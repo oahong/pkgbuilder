@@ -72,7 +72,7 @@ downloadDebianSrc() {
     fi
     dsc=$dscfile
     [[ -f ${workdir}/${dscfile} ]] || \
-        [[ -f ${ARTIFACTS}/${package}/${dscfile} ]] \
+        [[ -f ${ARTIFACTS}/${package}/${dscfile} ]] || \
             die EACCESS "Not able to locate ${dscfile} in both ${workdir} and ${ARTIFACTS}"
 }
 
