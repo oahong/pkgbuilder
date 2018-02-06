@@ -101,3 +101,14 @@ unlockScript() {
     rm -f $lockfile
     trap - INT TERM EXIT
 }
+
+listRepo() {
+    info "List supported upstream repository:"
+    echo -e "name\t\trepo\t\tcodename"
+    echo "============================================================"
+    for key in ${!UREPO[@]} ; do
+        echo -e "${key}\t${UREPO[$key]}\t${UCODENAME[$key]}"
+    done
+    echo "============================================================"
+    exit 0
+}
