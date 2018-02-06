@@ -6,6 +6,7 @@ declare -ra ARCHITECTURES=(
     # should be sw64
     sw_64
 )
+
 declare -rA DISTRIBUTIONS=(
     ['mips64el']='stable'
     ['sw_64']='stable'

@@ -84,7 +84,7 @@ printHelp() {
     local cmd=${0##*/}
     cat <<EOF >&2
 Usage:
-  ${cmd} -n PACKAGE|-d DSC [-a ARCH] [-l CHANGELOG] [-u HOST] [-b|-p] [-h]
+  ${cmd} -n PACKAGE|-d DSC [-a ARCH] [-l CHANGELOG] [-u HOST] [-r REPO] [-b|-p] [-h]
 
 Package builder for deepin mips team, version $SVERSION
 
@@ -98,6 +98,7 @@ Application Options:
   -n, --package=PACKAGE        Build PACKAGE
   -u, --upload=HOST            Upload build artifacts to HOST, you should
                                define HOST in dput config
+  -r, --repo=REPO              Download source package from predefined REPO
   -b, --build                  Perform a package build using dpkg-buildpackage
   -p, --pbuilder               Perform a package build using pbuilder
                                (recommended for a clean buid)

@@ -13,7 +13,7 @@ aptGetSource() {
         -o Debug::NoLocking=true \
         -o Acuqire::Retries=5 \
         -o APT::Architecture=${ARCH} \
-        -o APT::Default-Release=${DISTRIBUTIONS[${ARCH}]} \
+        -o APT::Default-Release=${UCODENAME[${repository}]} \
         -o APT::Get::Assume-Yes=true \
         -o APT::Get::AllowUnauthenticated=true"
 
@@ -21,8 +21,8 @@ aptGetSource() {
 
     # create sources.list
     cat <<EOF > ${aptdir}/sources.list-${ARCH}
-deb [lang=en] ${UPSTREAMREPO[$ARCH]} ${DISTRIBUTIONS[${ARCH}]} main contrib non-free
-deb-src [lang=en] ${UPSTREAMREPO[$ARCH]} ${DISTRIBUTIONS[${ARCH}]} main contrib non-free
+deb [lang=en] ${UREPO[$repository]} ${UCODENAME[${repository}]} main contrib non-free
+deb-src [lang=en] ${UREPO[$repository]} ${UCODENAME[${repository}]} main contrib non-free
 EOF
     # update package index
     apt-get ${apt_options} update
@@ -36,7 +36,7 @@ EOF
     createWorkdir
 
     pushd ${workdir}
-    info "Downloading source package from ${UPSTREAMREPO[$ARCH]}"
+    info "Downloading source package from ${UREPO[$ARCH]}"
     apt-get ${apt_options} source --download-only ${package}
     popd
 }
