@@ -7,16 +7,16 @@ declare -Ar MIRRORSITE=(
 
 # Fetch source package from those mirror
 # please also define the corresponding codenmae in UCODENAME
-declare -Ar UREPO=(
+declare -Ar USOURCE=(
     # debian stable mirror
     [debian]="${BASEMIRROR}/mips64el-debian"
-    # sw6a repository
+    # sw6a source
     [sw6a]="${BASEMIRROR}/sw6a"
-    # deepin x86 repository
+    # deepin x86 source
     [deepin]="http://pools.corp.deepin.com/deepin"
 )
 
-# upstream repository codename
+# upstream source codename
 declare -Ar UCODENAME=(
     [debian]=stable
     [sw6a]=kui

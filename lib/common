@@ -84,8 +84,8 @@ printHelp() {
     local cmd=${0##*/}
     cat <<EOF >&2
 Usage:
-  ${cmd} -n PACKAGE|-d DSC [-a ARCH] [-u HOST] [-r REPO] [-b|-p] [-h]
-  ${cmd} -l | --list-repo
+  ${cmd} -n PACKAGE|-d DSC [-a ARCH] [-u HOST] [-s SOURCE] [-b|-p] [-h]
+  ${cmd} -l | --list-src
 
 Package builder for deepin mips team, version $SVERSION
 
@@ -95,25 +95,21 @@ Application Options:
   -a, --arch=ARCH              Build package for ARCH architecture
   -d, --dsc=DSC                Build package according to a DSC, DSC should be
                                a local path or url to Debian src control file
-  -l, --changelog=CHANGELOG    Use CHANGELOG as debian package changelog
+  -l, --list-src               Print a list of predefined upstream sources
   -n, --package=PACKAGE        Build PACKAGE
-  -u, --upload=HOST            Upload build artifacts to HOST, you should
-                               define HOST in dput config
-  -r, --repo=REPO              Download source package from predefined REPO
+  -u, --upload=HOST            Upload build artifacts to HOST, define HOST in dput config
+  -s, --source=SOURCE          Download source package from predefined SOURCE
   -b, --build                  Perform a package build using dpkg-buildpackage
   -p, --pbuilder               Perform a package build using pbuilder
                                (recommended for a clean buid)
 
-Note:
-${cmd} will not issue any build command (pdebuild or dpkg-buildpackage) unless -p or -b option is specified.
 
 Examples:
-  ${cmd} -l                                        List predefined upstream repositories
-  ${cmd} -n dde-desktop                            Prepare for building dde-destop
-  ${cmd} -n dde-desktop -b                         Build dde-desktop from scratch
-  ${cmd} -n dde-desktop -b -u staging              Build dde-desktop then upload to staging
-  ${cmd} -n dde-api -p -l "Rebuild for testing"    Build dde-api in a clean pbuilder chroot
-  ${cmd} -a mips64el -n base-files -p              Build base-files in a clean mips64el chroot
+  ${cmd} -l                                        List predefined upstream sources
+  ${cmd} -n foo                                    Prepare for building package foo
+  ${cmd} -n dde-desktop -b                         Build foo from scratch
+  ${cmd} -n dde-desktop -b -u staging              Build foo then upload to host staging
+  ${cmd} -a mips64el -n base-files -p              Build foo in a clean mips64el chroot
 EOF
     exit 0
 }

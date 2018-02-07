@@ -103,11 +103,11 @@ unlockScript() {
 }
 
 listRepo() {
-    info "List supported upstream repository:"
+    info "List supported upstream sources:"
     echo -e "name\t\trepo\t\tcodename"
     echo "============================================================"
-    for key in ${!UREPO[@]} ; do
-        echo -e "${key}\t${UREPO[$key]}\t${UCODENAME[$key]}"
+    for key in ${!USOURCE[@]} ; do
+        echo -e "${key}\t${USOURCE[$key]}\t${UCODENAME[$key]}"
     done
     echo "============================================================"
     exit 0

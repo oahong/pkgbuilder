@@ -19,8 +19,8 @@ done
 [[ $EUID -eq 0 ]] && die "Don't build package with privileged user"
 
 OPTS=$(getopt -n $0 \
-              -o 'a:d:ln:u:bhpr:' \
-              --long arch:,dsc:,list-repo,package:,upload:,build,help,pbuilder,repo \
+              -o 'a:d:ln:u:bhps:' \
+              --long arch:,dsc:,list-repo,package:,upload:,build,help,pbuilder,source \
               -- "$@")
 
 [[ $? -eq 0 ]] || die EOPTS "Sorry! I don't understand!!!"
@@ -60,8 +60,8 @@ while : ; do
             printHelp
             shift
             ;;
-        -r|--repo)
-            repository=${2}
+        -s|--source)
+            source=${2}
             shift 2
             ;;
         --)
@@ -80,8 +80,8 @@ contains ARCH ARCHITECTURES || die EARCH "$ARCH is an unsupported architecture"
 source ${scriptdir}/conf/cowbuilder
 
 # set default upstream mirror
-if [[ -z $repository || -z ${UREPO[$repository]} ]] ; then
-    repository=debian
+if [[ -z $source || -z ${USOURCE[$source]} ]] ; then
+    source=debian
 fi
 [[ -z $changelog ]] && changelog="Rebuild on ${ARCH} via build script ${0##*/}"
 
