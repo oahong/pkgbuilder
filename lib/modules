@@ -77,6 +77,7 @@ downloadDebianSrc() {
 }
 
 prepareBuild() {
+    local dscfile=
     local srcdir=${workdir}/${package}-${version}
 
     info "clean up $srcdir"
@@ -86,20 +87,21 @@ prepareBuild() {
         dsc=${package}_${version}.dsc
     fi
 
-    local dscinw=${workdir}/${dsc}
-    local dscina=${ARTIFACTS}/${package}/${dsc}
+    dscs=(
+        ${workdir}/${dsc}
+        ${ARTIFACTS}/${package}/${dsc}
+    )
 
-    # Searching debian source control file in workdir o/ artifacts
-    if [[ -f ${dscinw} ]] ; then
-        info "Found ${dscinb}"
-        dpkg-source -x ${dscinw} ${srcdir}
-    elif [[ -f ${dscina} ]] ; then
-        info "Found ${dscina}"
-        dpkg-source -x ${dscina} ${srcdir}
-    else
-        die EACCESS "Fail to read Debian source control file"
-    fi
+    for dscfile in ${dscs[@]} ; do
+        if [[ -f $dscfile ]] ; then
+            info "Found ${dscfile}"
+            dpkg-source -x ${dscfile} ${srcdir}
+            return 0
+        fi
+    done
+    die EACCESS "Failed to read debian source control file"
 }
+
 
 buildPackage() {
     pushd ${workdir}/${package}-${version}
