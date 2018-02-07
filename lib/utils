@@ -102,7 +102,7 @@ unlockScript() {
     trap - INT TERM EXIT
 }
 
-listRepo() {
+listSrc() {
     info "List supported upstream sources:"
     echo -e "name\t\trepo\t\tcodename"
     echo "============================================================"
