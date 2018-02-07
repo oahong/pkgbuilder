@@ -36,7 +36,7 @@ EOF
     createWorkdir
 
     pushd ${workdir}
-    info "Downloading source package from ${UREPO[$ARCH]}"
+    info "Downloading source package from ${UREPO[$repository]}"
     apt-get ${apt_options} source --download-only ${package}
     popd
 }
