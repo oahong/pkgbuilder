@@ -26,9 +26,9 @@ initializePbuilder() {
 
     createdir ${WORKBASE}/deepin-chroot "Cow master data"
 
-    sudo cowbuilder --create \
-         --buildresult /dev/null \
-         ${PBUILDEROPTS[@]} \
+    sudo cowbuilder --create	 \
+         ${PBUILDEROPTS[@]}	 \
+         ${PBUILDEREXTRAOPTS[@]} \
          ${COWBUILDEROPTS[@]}
 }
 

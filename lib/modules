@@ -142,7 +142,7 @@ buildPackage() {
         eval pdebuild --pbuilder cowbuilder  \
              --use-pdebuild-internal         \
              --debbuildopts '"${DEBBUILDOPTS}"' \
-             --buildresult /dev/null         \
+             ${PBUILDEREXTRAOPTS[@]}         \
              --                              \
              ${PBUILDEROPTS[@]}              \
              ${COWBUILDEROPTS[@]} || \
