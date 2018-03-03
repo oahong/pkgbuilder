@@ -28,7 +28,6 @@ initializePbuilder() {
 
     sudo cowbuilder --create	 \
          ${PBUILDEROPTS[@]}	 \
-         ${PBUILDEREXTRAOPTS[@]} \
          ${COWBUILDEROPTS[@]}
 }
 

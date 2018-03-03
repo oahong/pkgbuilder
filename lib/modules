@@ -141,7 +141,8 @@ buildPackage() {
     else
         eval pdebuild --pbuilder cowbuilder  \
              --use-pdebuild-internal         \
-             --debbuildopts '"${DEBBUILDOPTS}"' \
+             --buildresult ${WORKBASE}/artifacts/${package} \
+             --debbuildopts '"${DEBBUILDOPTS}"'  \
              ${PBUILDEREXTRAOPTS[@]}         \
              --                              \
              ${PBUILDEROPTS[@]}              \

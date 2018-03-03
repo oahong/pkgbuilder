@@ -9,11 +9,6 @@ declare -ar PBUILDEROPTS=(
     "--aptconfdir   ${scriptdir}/apt"
 )
 
-# buildresult must be specifed as pdebuild option
-declare -r PBUILDEREXTRAOPTS=(
-    "--buildresult  ${WORKBASE}/artifacts"
-)
-
 declare -ar COWBUILDEROPTS=(
     "--basepath     ${WORKBASE}/base.cow-${ARCH}"
     "--buildplace   ${WORKBASE}/deepin-chroot"
