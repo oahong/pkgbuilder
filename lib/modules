@@ -127,6 +127,8 @@ buildPackage() {
     # function parameter should override DEBBUILDOPTS
     DEBBUILDOPTS+=" $@"
 
+    local artifactsdir=${ARTIFACTS}/${package}
+
     if [[ $build_pkg -eq 1 ]] ; then
         info "Checking build dependencies:"
         if dpkg-checkbuilddeps -a ${ARCH} debian/control; then
@@ -138,12 +140,13 @@ buildPackage() {
         info "buildpackage with options: ${DEBBUILDOPTS}"
         eval dpkg-buildpackage ${DEBBUILDOPTS} || \
                 die EBUILD "Failed to build ${package} via dpkg-buildpackage"
-        copyArtifacts
+        copyArtifacts ${artifactsdir}
     else
         # --buildresult option will do copyArtifacts for us
+        createdir ${artifactsdir} "artifacts dir"
         eval pdebuild --pbuilder cowbuilder  \
              --use-pdebuild-internal         \
-             --buildresult ${WORKBASE}/artifacts/${package} \
+             --buildresult ${artifactsdir} \
              --debbuildopts '"${DEBBUILDOPTS}"'  \
              ${PBUILDEREXTRAOPTS[@]}         \
              --                              \
@@ -157,7 +160,7 @@ buildPackage() {
 
 # copy build artifacts to ${artifactsdir}
 copyArtifacts() {
-    local artifactsdir=${ARTIFACTS}/${package}
+    local artifactsdir=${1}
     local changes=${workdir}/${package}_${version}_${ARCH}.changes
     if [[ -f $changes ]] ; then
         info "Copy build artifacts to $artifactsdir"
