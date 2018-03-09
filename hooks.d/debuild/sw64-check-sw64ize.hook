@@ -1,11 +1,1 @@
-#! /bin/bash
-
-echo "checking sw64ize"
-if grep -Riqs __alpha_ ; then
-        if grep -Riqs __sw_64 . ; then
-                exit 0
-        else
-                echo "Porting to sw64 is required"
-                exit 1
-        fi
-fi
+../pbuilder/sw64-check-sw64ize.hook
