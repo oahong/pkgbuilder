@@ -12,13 +12,6 @@ MYPBOPTIONS=(
 )
 
 cmd=$1
-arch=$2
-
-if [[ -n $arch ]] ; then
-    MYPBOPTIONS+=(
-        "--basepath     ${WORKBASE}/base.cow-${arch}"
-    )
-fi
 
 case $cmd in
     update)
@@ -28,7 +21,7 @@ case $cmd in
         sudo cowbuilder --login --save ${MYPBOPTIONS[@]}
         ;;
     *)
-        echo "Usage: $0 update|login [architecture]"
+        echo "Usage: $0 update|login"
         exit 1
         ;;
 esac
@@ -37,3 +30,4 @@ esac
 # coding: utf-8
 # mode: sh-shell
 # End:
+# vim: number tabstop=4 softtabstop=4 expandtab

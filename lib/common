@@ -84,7 +84,7 @@ printHelp() {
     local cmd=${0##*/}
     cat <<EOF >&2
 Usage:
-  ${cmd} -n PACKAGE|-d DSC [-a ARCH] [-u HOST] [-s SOURCE] [-b|-p] [-h]
+  ${cmd} -n PACKAGE|-d DSC [-u HOST] [-s SOURCE] [-b|-p] [-h]
   ${cmd} -l | --list-src
 
 Package builder for deepin mips team, version $SVERSION
@@ -92,13 +92,12 @@ Package builder for deepin mips team, version $SVERSION
 Help Options:
   -h, --help            Show help options
 Application Options:
-  -a, --arch=ARCH              Build package for ARCH architecture
   -d, --dsc=DSC                Build package according to a DSC, DSC should be
                                a local path or url to Debian src control file
   -l, --list-src               Print a list of predefined upstream sources
   -n, --package=PACKAGE        Build PACKAGE
   -u, --upload=HOST            Upload build artifacts to HOST, define HOST in dput config
-  -s, --source=SOURCE          Download source package from predefined SOURCE
+  -s, --source=SOURCE          Download source package from predefined SOURCE (Read -l output)
   -b, --build                  Perform a package build using dpkg-buildpackage
   -p, --pbuilder               Perform a package build using pbuilder
                                (recommended for a clean buid)
@@ -107,7 +106,7 @@ Application Options:
 Examples:
   ${cmd} -l                                        List predefined upstream sources
   ${cmd} -n foo                                    Prepare for building package foo
-  ${cmd} -n dde-desktop -b                         Build foo from scratch
+  ${cmd} -n dde-desktop -b -s debian               Build foo from scratch, get dsc from debian
   ${cmd} -n dde-desktop -b -u staging              Build foo then upload to host staging
   ${cmd} -a mips64el -n base-files -p              Build foo in a clean mips64el chroot
 EOF

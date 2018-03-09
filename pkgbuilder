@@ -19,8 +19,8 @@ done
 [[ $EUID -eq 0 ]] && die "Don't build package with privileged user"
 
 OPTS=$(getopt -n $0 \
-              -o 'a:d:ln:u:bhps:' \
-              --long arch:,dsc:,list-src,package:,upload:,build,help,pbuilder,source \
+              -o 'd:ln:u:bhps:' \
+              --long dsc:,list-src,package:,upload:,build,help,pbuilder,source \
               -- "$@")
 
 [[ $? -eq 0 ]] || die EOPTS "Sorry! I don't understand!!!"
@@ -29,10 +29,6 @@ eval set -- "${OPTS}"
 
 while : ; do
     case $1 in
-        -a|--arch)
-            ARCH=$2
-            shift 2
-            ;;
         -d|--dsc)
             dsc=$2
             shift 2
