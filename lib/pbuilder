@@ -12,6 +12,7 @@ AUTO_DEBSIGN=no
 ARCHITECTURE=${ARCH}
 BINDMOUNT=${WORKBASE}
 ALLOWUNTRUSTED=yes
+COMPONENTS="main contrib non-free"
 DEBOOTSTRAPOPTS=( '--variant=buildd' '--no-check-gpg' )
 EXTRAPACKAGES="lintian eatmydata"
 MIRRORSITE="${MIRRORSITE[${ARCH}]}"
