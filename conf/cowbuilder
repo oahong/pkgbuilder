@@ -1,5 +1,5 @@
-declare -r DEBEMAIL=${DEBEMAIL:-mips@deepin.com}
-declare -r DEBFULLNAME=${DEBFULLNAME:-deepin/MIPS team}
+declare -r DEBEMAIL=${DEBEMAIL:-sunway@deepin.com}
+declare -r DEBFULLNAME=${DEBFULLNAME:-deepin/sunway team}
 
 declare -ar PBUILDEROPTS=(
     "--distribution ${DISTRIBUTIONS[${ARCH}]}"
