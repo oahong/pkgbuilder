@@ -11,7 +11,10 @@ declare -Ar USOURCE=(
     # debian stable mirror
     [debian]="${BASEMIRROR}/mips64el-debian"
     # sw6a source
+    [sunway]="${BASEMIRROR}/sunway"
     [sw6a]="${BASEMIRROR}/sw6a"
+    [backports]="${BASEMIRROR}/debian-backports"
+    [security]="${BASEMIRROR}/debian-security"
     # deepin x86 source
     [deepin]="http://pools.corp.deepin.com/deepin"
 )
@@ -19,7 +22,10 @@ declare -Ar USOURCE=(
 # upstream source codename
 declare -Ar UCODENAME=(
     [debian]=stable
+    [sunway]=kui
     [sw6a]=kui
+    [backports]=stretch-backports
+    [security]=stable/updates
     [deepin]=panda
 )
 # Local variables:
