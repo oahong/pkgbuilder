@@ -2,19 +2,18 @@ declare -r BASEMIRROR=http://s135.sh.deepin.cn
 # MIRRORSITE: debootstrap mirror for each supported architecture
 declare -Ar MIRRORSITE=(
     [mips64el]="${BASEMIRROR}/mips64el-deepin"
-    [sw_64]="${BASEMIRROR}/sw6a"
+    [sw_64]="${BASEMIRROR}/sunway"
 )
 
 # Fetch source package from those mirror
 # please also define the corresponding codenmae in UCODENAME
 declare -Ar USOURCE=(
-    # debian stable mirror
+    # debian stable mirrors
     [debian]="${BASEMIRROR}/mips64el-debian"
-    # sw6a source
-    [sunway]="${BASEMIRROR}/sunway"
-    [sw6a]="${BASEMIRROR}/sw6a"
     [backports]="${BASEMIRROR}/debian-backports"
     [security]="${BASEMIRROR}/debian-security"
+    # sunway repository
+    [sunway]="${BASEMIRROR}/sunway"
     # deepin x86 source
     [deepin]="http://pools.corp.deepin.com/deepin"
 )
@@ -22,10 +21,9 @@ declare -Ar USOURCE=(
 # upstream source codename
 declare -Ar UCODENAME=(
     [debian]=stable
-    [sunway]=kui
-    [sw6a]=kui
     [backports]=stretch-backports
     [security]=stable/updates
+    [sunway]=kui
     [deepin]=panda
 )
 # Local variables:
