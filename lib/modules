@@ -109,6 +109,11 @@ prepareBuild() {
 buildPackage() {
     pushd ${workdir}/${package}-${version}
 
+    # Prevent architecture independent package from being built
+    if [[ $(grep Architecture: debian/control | grep -v all | wc -l) -eq 0 ]] ; then
+           die EINDEP "Please import the architecture-independent package into repository."
+    fi
+
     # return unless we want to build a package
     [[ ${build_pkg} -eq 1 ]] || \
         [[ ${build_pkg_via_pbuilder} -eq 1 ]] || return 0

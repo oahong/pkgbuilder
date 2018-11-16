@@ -6,6 +6,7 @@ declare -Ar ERROR=(
     [EPACKAGE]=5    # missing package
     [EARCH]=6       # architecture not supported
     [EBUILD]=7      # build failed
+    [EINDEP]=8      # Import the architecture indepent package!
     [EMISC]=20      # undefined error
 )
 
