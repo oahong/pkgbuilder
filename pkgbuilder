@@ -19,8 +19,8 @@ done
 [[ $EUID -eq 0 ]] && die "Don't build package with privileged user"
 
 OPTS=$(getopt -n $0 \
-              -o 'd:ln:u:bhps:' \
-              --long dsc:,list-src,package:,upload:,build,help,pbuilder,source \
+              -o 'd:ln:u:bhprs:' \
+              --long dsc:,list-src,package:,upload:,build,help,pbuilder,rebuild,source \
               -- "$@")
 
 [[ $? -eq 0 ]] || die EOPTS "Sorry! I don't understand!!!"
@@ -54,6 +54,10 @@ while : ; do
             ;;
         -h|--help)
             printHelp
+            shift
+            ;;
+        -r|--rebuild)
+            rebuild_architecture_independent_package=1
             shift
             ;;
         -s|--source)
