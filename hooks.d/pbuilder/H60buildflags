@@ -9,6 +9,8 @@ case ${ARCH} in
         cat > /etc/dpkg/buildflags.conf <<EOF
 APPEND CFLAGS -mieee
 APPEND CXXFLAGS -mieee
+APPEND FCFLAGS -mieee
+APPEND FFLAGS -mieee
 EOF
         ;;
 esac
