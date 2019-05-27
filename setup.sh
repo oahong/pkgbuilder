@@ -49,3 +49,7 @@ info "Remove old executable"
 rm -f /usr/local/bin/deepin-buildpackage
 
 mkdir -pv ${ARTIFACTS}
+
+info "Change folder permission"
+chown $(logname). -v ${ARTIFACTS}
+chown $(logname). -vR ${scriptdir}
