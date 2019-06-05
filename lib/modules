@@ -112,6 +112,7 @@ buildPackage() {
     if [[ ${rebuild_architecture_independent_package} -ne 1 ]] ; then
         # Prevent architecture independent package from being built
         if [[ $(grep Architecture: debian/control | grep -v all | wc -l) -eq 0 ]] ; then
+            # XXX: 软件包构建的命令添加-r参数强制进行软件包的重构
             die EINDEP "Please import the architecture-independent package into repository." \
 		"You can force rebuild with -r command switch"
         fi
