@@ -33,7 +33,7 @@ EOF
     aptcache=$(apt-cache ${apt_options} showsrc $package)
     # get package name and package version
     package=$(echo "${aptcache}" | awk '/^Package:/ {print $2; exit}')
-    version=$(echo "${aptcache}" | awk -F: '/^Version:/ {gsub(/ /, "", $NF); ver=$NF} END {print ver}')
+    version=$(echo "${aptcache}" | awk -F: '/^Version:/ {gsub(/ /, "", $NF); ver=$NF; exit} END {print ver}')
 
     # download debian source code
     createWorkdir

@@ -1,6 +1,6 @@
 #! /bin/bash
 
-set -e
+set -e -pipefail
 
 declare -r scriptdir=$(dirname $(readlink -ef $0))
 
