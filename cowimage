@@ -18,10 +18,13 @@ case $cmd in
         sudo cowbuilder --update ${MYPBOPTIONS[@]}
         ;;
     login)
+        sudo cowbuilder --login ${MYPBOPTIONS[@]}
+        ;;
+    login-save)
         sudo cowbuilder --login --save ${MYPBOPTIONS[@]}
         ;;
     *)
-        echo "Usage: $0 update|login"
+        echo "Usage: $0 update|login|login-save"
         exit 1
         ;;
 esac
