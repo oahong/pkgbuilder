@@ -104,8 +104,6 @@ createPbuilderChroot
 # everything else beyond '--' in command line goes to buildPackage function
 buildPackage $@
 uploadArtifacts
-# release the lock
-unlockScript
 
 # Local variables:
 # coding: utf-8

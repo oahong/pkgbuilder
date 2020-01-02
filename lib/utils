@@ -70,13 +70,6 @@ lockScript() {
     fi
 }
 
-unlockScript() {
-    local lockfile=/tmp/${package}-${version}-lock
-    info "Releasing mutex lock on $lockfile"
-    rm -f $lockfile
-    trap - INT TERM EXIT
-}
-
 listSrc() {
     info "List supported upstream sources:"
     echo -e "name\t\trepo\t\tcodename"
