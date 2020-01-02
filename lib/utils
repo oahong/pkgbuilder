@@ -64,7 +64,7 @@ lockScript() {
     local lockfile=/tmp/${package}-${version}-lock
     if ( set -o noclobber; echo $$ > $lockfile ) 2>/dev/null ; then
         info "Acquiring a mutex lock on $lockfile"
-        trap "ret=$?; reset; rm -f $lockfile; exit $ret" INT TERM EXIT
+        trap "ret=\$?; reset; rm -f $lockfile; exit \$ret" INT TERM EXIT
     else
         die "Someone is building ${package} ${version} via PID $(cat $lockfile)"
     fi
