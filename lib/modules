@@ -1,5 +1,16 @@
 #! /bin/bash
 
+listSrc() {
+    info "List supported upstream sources:"
+    echo -e "name\t\trepo\t\tcodename"
+    echo "============================================================"
+    for key in ${!USOURCE[@]} ; do
+        echo -e "${key}\t${USOURCE[$key]}\t${UCODENAME[$key]}"
+    done
+    echo "============================================================"
+    exit 0
+}
+
 # download debian src
 aptGetSource() {
     local aptcache=

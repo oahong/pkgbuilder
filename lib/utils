@@ -69,14 +69,3 @@ lockScript() {
         die "Someone is building ${package} ${version} via PID $(cat $lockfile)"
     fi
 }
-
-listSrc() {
-    info "List supported upstream sources:"
-    echo -e "name\t\trepo\t\tcodename"
-    echo "============================================================"
-    for key in ${!USOURCE[@]} ; do
-        echo -e "${key}\t${USOURCE[$key]}\t${UCODENAME[$key]}"
-    done
-    echo "============================================================"
-    exit 0
-}
