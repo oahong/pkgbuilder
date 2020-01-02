@@ -6,10 +6,11 @@ declare -r scriptdir=$(dirname $(readlink -ef $0))
 
 declare -ra modules=(
     conf/{env,mirrors,errors}
-    lib/{common,utils,modules,pbuilder}
+    lib/{common,modules,pbuilder}
 )
 
-##########
+#
+#########
 # Real operation starts
 ##############################
 for module in ${modules[@]}; do
@@ -77,6 +78,7 @@ done
 
 contains ARCH ARCHITECTURES || die EARCH "$ARCH is an unsupported architecture"
 
+source ${scriptdir}/lib/utils
 source ${scriptdir}/conf/cowbuilder
 
 # set default upstream mirror
