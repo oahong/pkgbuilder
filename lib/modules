@@ -193,8 +193,8 @@ copyArtifacts() {
 }
 
 uploadArtifacts() {
+    [[ -n $uhost ]] || return 0
     hasBin dput || die EPACKAGE "Install dput"
-    [[ -n $uhost ]] || return
     if dput -H | grep -wqs ${uhost} ; then
         dput -uf ${uhost} ${ARTIFACTS}/${package}/${package}_${version}_${ARCH}.changes
     else
