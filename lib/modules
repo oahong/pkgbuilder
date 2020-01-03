@@ -201,4 +201,9 @@ uploadArtifacts() {
         warn "No ${uhost} definition in dput configuration, ignore package upload"
     fi
 }
+
+# Local variables:
+# coding: utf-8
+# mode: sh-shell
+# End:
 # vim: number tabstop=4 softtabstop=4 expandtab
