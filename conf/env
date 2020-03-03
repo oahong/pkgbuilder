@@ -1,5 +1,5 @@
 declare ARCH=$(dpkg-architecture -qDEB_HOST_ARCH)
-declare DEBBUILDOPTS="-d -us -uc -sa -jauto"
+declare DEBBUILDOPTS="-d -us -uc -sa -Jauto"
 
 declare -ra ARCHITECTURES=(
     mips64el
