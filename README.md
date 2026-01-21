@@ -1,4 +1,5 @@
 # Build debian packages from dsc (debian source package)
+```sh
 Usage:
   pkgbuilder -n PACKAGE|-d DSC [-u HOST] [-s SOURCE] [-b|-p] [-r] [-h]
   pkgbuilder -l | --list-src
@@ -24,3 +25,4 @@ Examples:
   pkgbuilder -n dde-desktop -b -s debian               Build foo from scratch, get dsc from debian
   pkgbuilder -n dde-desktop -b -u staging              Build foo then upload to host staging
   pkgbuilder -a mips64el -n base-files -p              Build foo in a clean mips64el chroot
+```
